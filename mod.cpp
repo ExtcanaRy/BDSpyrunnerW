@@ -469,6 +469,20 @@ THOOK(onUseItem, bool, "?useItemOn@GameMode@@UEAA_NAEAVItemStack@@AEBVBlockPos@@
 		return original(_this, item, bp, a4, a5, b);
 	return false;
 }
+THOOK(onUseItemEx, bool, "?baseUseItem@GameMode@@QEAA_NAEAVItemStack@@@Z", 
+	uintptr_t* _this, ItemStack* item) {
+	EventCallBackHelper h(EventCode::onUseItemEx);
+	Player* p = Dereference<Player*>(_this, 8);
+	h
+		.insert("player", p)
+		.insert("itemid", item->getId())
+		.insert("itemaux", item->getAuxValue())
+		.insert("itemcount", item->getCount())
+		.insert("itemname", item->getName());
+	if (h.call())
+		return original(_this, item);
+	return false;
+}
 //放置方块
 THOOK(onPlaceBlock, bool, "?mayPlace@BlockSource@@QEAA_NAEBVBlock@@AEBVBlockPos@@EPEAVActor@@_N@Z",
 	BlockSource* _this, Block* b, BlockPos* bp, unsigned char a4, Actor* p, bool _bool) {
