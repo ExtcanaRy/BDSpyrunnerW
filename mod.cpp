@@ -499,6 +499,21 @@ THOOK(onPlaceBlock, bool, "?mayPlace@BlockSource@@QEAA_NAEBVBlock@@AEBVBlockPos@
 	}
 	return original(_this, b, bp, a4, p, _bool);
 }
+//已放置方块
+THOOK(onPlacedBlock, void, "?sendBlockPlacedByPlayer@BlockEventCoordinator@@QEAAXAEAVPlayer@@AEBVBlock@@AEBVBlockPos@@_N@Z",
+    uintptr_t _this, Player* p, Block* b, BlockPos* bp, bool _bool) {
+	EventCallBackHelper h(EventCode::onPlacedBlock);
+	if (IsPlayer(p)) {
+		BlockLegacy* bl = b->getBlockLegacy();
+		h
+			.insert("player", p)
+			.insert("blockname", bl->getBlockName())
+			.insert("blockid", bl->getBlockItemID())
+			.insert("position", bp);
+		h.call();
+	}
+	original(_this, p, b, bp, _bool);
+}
 //破坏方块
 THOOK(onDestroyBlock, bool, "?checkBlockDestroyPermissions@BlockSource@@QEAA_NAEAVActor@@AEBVBlockPos@@AEBVItemStackBase@@_N@Z",
 	BlockSource* _this, Actor* a1, BlockPos* a2, ItemStack* a3, bool a4) {

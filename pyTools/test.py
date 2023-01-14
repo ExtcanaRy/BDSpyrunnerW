@@ -112,6 +112,12 @@ def testonPlaceBlock(e):
 #mc.setListener("onPlaceBlock", testonPlaceBlock)
 # status: pass
 
+def testonPlacedBlock(e):
+	printLog(f"[TEST] Listener onPlacedBlock i_e['blockid'] = {e['blockid']}, s_e['player'].name = {e['player'].name}") # Entity.isstand -> Entity.is_standing
+	#mc.removeListener("onPlacedBlock", testonPlacedBlock)
+#mc.setListener("onPlacedBlock", testonPlacedBlock)
+# status: pass
+
 def testonDestroyBlock(e):
 	printLog(f"[TEST] Listener onDestroyBlock l_e['position'] = {listToStr(e['position'])}, {e['position'][1]}, {e['position'][2]}）, b_e['player'].is_sneaking = {e['player'].is_sneaking}") # issneak -> is_sneaking
 	#mc.removeListener("onDestroyBlock", testonDestroyBlock)
