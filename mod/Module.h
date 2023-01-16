@@ -12,3 +12,5 @@ inline std::unordered_map<std::string, std::pair<std::string, PyObject*>> g_comm
 inline static float g_damage = 0;
 
 extern "C" PyObject * mc_init();
+
+__int64 getCurrentTime();

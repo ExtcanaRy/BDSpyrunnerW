@@ -15,6 +15,7 @@
 #include "mod/Event.h"
 #include "mod/Module.h"
 #include "mod/Version.h"
+#include "mc/InventoryTransaction.h"
 
 #define PLUGIN_PATH "plugins\\py\\"
 
@@ -450,6 +451,34 @@ THOOK(onPlayerLeft, void, "?_onPlayerLeft@ServerNetworkHandler@@AEAAXPEAVServerP
 	h.call();
 	return original(_this, p, v3);
 }
+
+Vec3 lastPlayerPosition;
+Vec3 lastClickPosition;
+NetworkIdentifier* lastPlayerNetworkIdentifier = NULL;
+__int64 lastUseItemTime = 0;
+THOOK(filterInventoryTransaction, void, "?handle@ServerNetworkHandler@@UEAAXAEBVNetworkIdentifier@@AEBVInventoryTransactionPacket@@@Z", uintptr_t _this, NetworkIdentifier* nid, InventoryTransactionPacket& packet) {
+	//cout << "[BDSpyrunner] AEBVInventoryTransactionPacket " << packet.transaction->transactionType << endl;
+	if(packet.transaction->transactionType == 2) {
+		if (lastPlayerNetworkIdentifier == nid && lastPlayerPosition == packet.transaction->playerPosition //&& lastClickPosition == packet.transaction->clickPosition
+			&& (int)(lastClickPosition.x * 100) == (int)(packet.transaction->clickPosition.x * 100)
+			&& (int)(lastClickPosition.z * 100) == (int)(packet.transaction->clickPosition.z * 100) ) {
+			//cout << "[BDSpyrunner] AEBVInventoryTransactionPacket " << (getCurrentTime() - lastUseItemTime) << endl;
+			if((getCurrentTime() - lastUseItemTime) < 500) {
+				return;
+			}
+			lastUseItemTime = getCurrentTime();
+		} else if(packet.transaction->clickPosition.x != 0.0 || packet.transaction->clickPosition.y != 0.0 || packet.transaction->clickPosition.z != 0.0) {
+			lastPlayerNetworkIdentifier = nid;
+			lastPlayerPosition = packet.transaction->playerPosition;
+			lastClickPosition = packet.transaction->clickPosition;
+			lastUseItemTime = getCurrentTime();
+		}
+		//cout << "[BDSpyrunner] AEBVInventoryTransactionPacket " << packet.transaction->playerPosition.toString() << endl;
+		//cout << "[BDSpyrunner] AEBVInventoryTransactionPacket " << packet.transaction->clickPosition.toString() << endl;
+	}
+	return original(_this, nid, packet);
+}
+
 //使用物品
 THOOK(onUseItem, bool, "?useItemOn@GameMode@@UEAA_NAEAVItemStack@@AEBVBlockPos@@EAEBVVec3@@PEBVBlock@@@Z",
 	uintptr_t _this, ItemStack* item, BlockPos* bp, char a4, uintptr_t a5, Block* b) {

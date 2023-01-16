@@ -8,6 +8,12 @@ struct Vec3 {
 		sprintf_s(str, "(%f,%f,%f)", x, y, z);
 		return str;
 	}
+	bool operator==(Vec3 pos) {
+		if (x == pos.x && y == pos.y && z == pos.z) {
+			return true;
+		}
+		return false;
+	}
 };
 struct Vec2 {
 	float x = 0.0f, y = 0.0f;

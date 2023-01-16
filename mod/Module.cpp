@@ -412,3 +412,8 @@ extern "C" PyObject * mc_init() {
 	PyModule_AddObject(module, "Entity", reinterpret_cast<PyObject*>(&PyEntity_Type));
 	return module;
 }
+//获取时间（毫秒）
+__int64 getCurrentTime() {
+	time_t now = clock();
+	return now;
+}
