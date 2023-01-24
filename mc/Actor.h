@@ -61,17 +61,22 @@ struct Actor {
 	uintptr_t getUniqueID();
 	//获取实体类型
 	std::string getEntityTypeName();
-	//更新属性
+	//属性
 	uintptr_t updateAttrs();
+	uintptr_t getAttrs(void* a2);
+	float getCurrentValue(uintptr_t attr);
+	float getMaxValue(uintptr_t attr);
+	void setCurrentValue(uintptr_t attr, float value);
+	void setMaxValue(uintptr_t attr, float value);
 	//获取地图信息
 	Level* getLevel();
 	//添加一个状态
 	uintptr_t addEffect(uintptr_t ef);
-	//获取生命值
-	int getHealth();
-	int getMaxHealth();
-	void setHealth(int value);
-	void setMaxHealth(int value);
+	//生命值
+	float getHealth();
+	float getMaxHealth();
+	void setHealth(float value);
+	void setMaxHealth(float value);
 	//获取副手
 	ItemStack* getOffhandSlot();
 	Tag* save();

@@ -107,50 +107,65 @@ string Actor::getEntityTypeName() {
 	return type;
 }
 
-//更新属性
-
+//属性
 uintptr_t Actor::updateAttrs() {
 	return SymCall<uintptr_t>("?_sendDirtyActorData@Actor@@QEAAXXZ", this);
 }
 
-//获取地图信息
+uintptr_t Actor::getAttrs(void* a2) {
+	return SymCall<uintptr_t>("?getMutableAttribute@Actor@@UEAAPEAVAttributeInstance@@AEBVAttribute@@@Z", this, a2);
+}
 
+float Actor::getCurrentValue(uintptr_t attr) {
+	return SymCall<float>("?getCurrentValue@AttributeInstance@@QEBAMXZ", attr);
+}
+
+float Actor::getMaxValue(uintptr_t attr) {
+	return SymCall<float>("?getMaxValue@AttributeInstance@@QEBAMXZ", attr);
+}
+
+void Actor::setCurrentValue(uintptr_t attr, float value) {
+	SymCall("?setCurrentValue@AttributeInstance@@QEAAXM@Z", attr, value);
+}
+
+void Actor::setMaxValue(uintptr_t attr, float value) {
+	SymCall("?setMaxValue@AttributeInstance@@QEAAXM@Z", attr, value);
+}
+
+//获取地图信息
 Level* Actor::getLevel() {
 	return SymCall<Level*>("?getLevel@Actor@@QEBAAEBVLevel@@XZ", this);
 }
 
 //添加一个状态
-
 uintptr_t Actor::addEffect(uintptr_t ef) {
 	return SymCall<uintptr_t>("?addEffect@Actor@@QEAAXAEBVMobEffectInstance@@@Z", this, ef);
 }
 
-//获取生命值
-
-int Actor::getHealth() {
-	return SymCall<int>("?getHealth@Actor@@QEBAHXZ", this);
+//生命值
+float Actor::getHealth() {
+	uintptr_t hattr = getAttrs(SYM("?HEALTH@SharedAttributes@@2VAttribute@@B"));
+	return getCurrentValue(hattr);
+	//return SymCall<int>("?getHealth@Actor@@QEBAHXZ", this);
 }
 
-int Actor::getMaxHealth() {
-	return SymCall<int>("?getMaxHealth@Actor@@QEBAHXZ", this);
+float Actor::getMaxHealth() {
+	uintptr_t hattr = getAttrs(SYM("?HEALTH@SharedAttributes@@2VAttribute@@B"));
+	return getMaxValue(hattr);
+	//return SymCall<int>("?getMaxHealth@Actor@@QEBAHXZ", this);
 }
 
-void Actor::setHealth(int value) {
-	uintptr_t hattr = (*reinterpret_cast<uintptr_t(**)(Actor*, void*)>(*(uintptr_t*)this + 1552))
-		(this, SYM("?HEALTH@SharedAttributes@@2VAttribute@@B"));
-	Dereference<int>(hattr, 132) = value;
-	//SymCall("?_setDirty@AttributeInstance@@AEAAXXZ", hattr);
+void Actor::setHealth(float value) {
+	uintptr_t hattr = getAttrs(SYM("?HEALTH@SharedAttributes@@2VAttribute@@B"));
+	setCurrentValue(hattr, value);
 }
 
-void Actor::setMaxHealth(int value) {
-	uintptr_t hattr = (*reinterpret_cast<uintptr_t(**)(Actor*, void*)>(*(uintptr_t*)this + 1552))
-		(this, SYM("?HEALTH@SharedAttributes@@2VAttribute@@B"));
-	Dereference<int>(hattr, 128) = value;
-	//SymCall("?_setDirty@AttributeInstance@@AEAAXXZ", hattr);
+void Actor::setMaxHealth(float value) {
+	uintptr_t hattr = getAttrs(SYM("?HEALTH@SharedAttributes@@2VAttribute@@B"));
+	setMaxValue(hattr, value);
 }
 
 //获取副手
-
 ItemStack* Actor::getOffhandSlot() {
 	return SymCall<ItemStack*>("?getOffhandSlot@Actor@@QEBAAEBVItemStack@@XZ", this);
 }

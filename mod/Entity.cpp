@@ -172,14 +172,14 @@ static PyObject* getHealth(PyObject* self, void*) {
 	Actor* a = PyEntity::asActor(self);
 	if (!a)
 		return nullptr;
-	return PyLong_FromLong(a->getHealth());
+	return PyFloat_FromDouble(static_cast<double>(a->getHealth()));
 }
 static int setHealth(PyObject* self, PyObject* arg, void*) {
-	if (PyLong_Check(arg)) {
+	if (PyNumber_Check(arg)) {
 		Actor* a = PyEntity::asActor(self);
 		if (!a)
 			return -1;
-		a->setHealth(PyLong_AsLong(arg));
+		a->setHealth(static_cast<float>(PyFloat_AsDouble(arg)));
 		return 0;
 	}
 	return PyErr_BadArgument(), -1;
@@ -189,14 +189,14 @@ static PyObject* getMaxHealth(PyObject* self, void*) {
 	Actor* a = PyEntity::asActor(self);
 	if (!a)
 		return nullptr;
-	return PyLong_FromLong(a->getMaxHealth());
+	return PyFloat_FromDouble(static_cast<double>(a->getMaxHealth()));
 }
 static int setMaxHealth(PyObject* self, PyObject* arg, void*) {
-	if (PyLong_Check(arg)) {
+	if (PyNumber_Check(arg)) {
 		Actor* a = PyEntity::asActor(self);
 		if (!a)
 			return -1;
-		a->setMaxHealth(PyLong_AsLong(arg));
+		a->setMaxHealth(static_cast<float>(PyFloat_AsDouble(arg)));
 		return 0;
 	}
 	return PyErr_BadArgument(), -1;
