@@ -1,4 +1,4 @@
-ï»¿//mod.cpp æ’ä»¶æ¨¡å—
+//mod.cpp ²å¼şÄ£¿é
 #include <filesystem>
 #include <fstream>
 #include <thread>
@@ -24,7 +24,7 @@ using namespace std;
 namespace fs = filesystem;
 #pragma region Function
 #if 0
-//Dllå…¥å£å‡½æ•°
+//DllÈë¿Úº¯Êı
 BOOL WINAPI DllMain(
 	HINSTANCE hinstDLL	/* handle to DLL module */,
 	DWORD fdwReason		/* reason for calling function */,
@@ -48,7 +48,7 @@ BOOL WINAPI DllMain(
 	}
 	return TRUE;  // Successful DLL_PROCESS_ATTACH.
 }
-//GBKè½¬UTF8
+//GBK×ªUTF8
 static string GbkToUtf8(const char* src_str) {
 	int len = MultiByteToWideChar(CP_ACP, 0, src_str, -1, NULL, 0);
 	wchar_t* wstr = new wchar_t[len + 1];
@@ -63,7 +63,7 @@ static string GbkToUtf8(const char* src_str) {
 	if (str) delete[] str;
 	return strTemp;
 }
-//UTF8è½¬GBK
+//UTF8×ªGBK
 static string Utf8ToGbk(const char* src_str) {
 	int len = MultiByteToWideChar(CP_UTF8, 0, src_str, -1, NULL, 0);
 	wchar_t* wszGBK = new wchar_t[len + 1];
@@ -78,7 +78,7 @@ static string Utf8ToGbk(const char* src_str) {
 	if (szGBK) delete[] szGBK;
 	return strTemp;
 }
-//è½¬å®½å­—ç¬¦
+//×ª¿í×Ö·û
 static wstring ToWstring(string_view s) {
 	string curlLocale = setlocale(LC_ALL, NULL);
 	setlocale(LC_ALL, "chs");
@@ -93,10 +93,10 @@ static wstring ToWstring(string_view s) {
 	setlocale(LC_ALL, curlLocale.c_str());
 	return result;
 }
-//è®¿é—®url
+//·ÃÎÊurl
 static Json AccessUrlForJson(const wchar_t* url) {
 	string data;
-	//éç©ºç»ˆæ­¢
+	//·Ç¿ÕÖÕÖ¹
 	char buffer[BLOCK_SIZE];
 
 	HINTERNET hSession = InternetOpen(USER_AGENT, INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
@@ -114,9 +114,9 @@ static Json AccessUrlForJson(const wchar_t* url) {
 	InternetCloseHandle(hSession);
 	return StringToJson(data);
 }
-//è®¿é—®url
+//·ÃÎÊurl
 static void AccessUrlForFile(const wchar_t* url, string_view filename) {
-	//éç©ºç»ˆæ­¢
+	//·Ç¿ÕÖÕÖ¹
 	char buffer[BLOCK_SIZE];
 
 	HINTERNET hSession = InternetOpen(USER_AGENT, INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
@@ -137,7 +137,7 @@ static void AccessUrlForFile(const wchar_t* url, string_view filename) {
 	InternetCloseHandle(handle2);
 	InternetCloseHandle(hSession);
 }
-//æ£€æŸ¥ç‰ˆæœ¬
+//¼ì²é°æ±¾
 static void CheckPluginVersion() {
 	if (!fs::exists(BAT_PATH))
 		return;
@@ -159,8 +159,8 @@ static void CheckPluginVersion() {
 	exit(0);
 }
 #endif 
-//äº‹ä»¶å›è°ƒåŠ©æ‰‹
-//åˆ›å»ºä¼šç”³è¯·GIL
+//ÊÂ¼ş»Øµ÷ÖúÊÖ
+//´´½¨»áÉêÇëGIL
 class EventCallBackHelper {
 public:
 	EventCallBackHelper(EventCode t) :
@@ -172,10 +172,10 @@ public:
 		}
 		PyGILState_Release(gil_);
 	}
-	//äº‹ä»¶å›è°ƒ
+	//ÊÂ¼ş»Øµ÷
 	bool call() {
 		bool intercept = true;
-		//å¦‚æœæ²¡æœ‰åˆ™è·³è¿‡
+		//Èç¹ûÃ»ÓĞÔòÌø¹ı
 		auto& cbs = g_callback_functions[type_];
 		//Py_BEGIN_CALL;
 		//Py_XINCREF(arg_);
@@ -229,6 +229,9 @@ public:
 	EventCallBackHelper& insert(string_view key, float item) {
 		return insert(key, PyLong_FromDouble(item));
 	}
+	EventCallBackHelper& insert(string_view key, void* item) {
+    	return insert(key, PyLong_FromVoidPtr(item));
+	}
 private:
 	EventCode type_;
 	PyObject* arg_;
@@ -236,7 +239,7 @@ private:
 };
 #pragma endregion
 #pragma region Hook List
-//å°†Pythonè§£é‡Šå™¨åˆå§‹åŒ–æ’å…¥bdsä¸»å‡½æ•°
+//½«Python½âÊÍÆ÷³õÊ¼»¯²åÈëbdsÖ÷º¯Êı
 THOOK(BDS_Main, int, "main",
 	int argc, char* argv[], char* envp[]) {
 #if 0
@@ -255,8 +258,8 @@ THOOK(BDS_Main, int, "main",
 	                "tag10": {
 	                    "display10": {
 	                        "Lore9": [
-	                            "é’ˆä¸æˆ³",
-	                            "å¾ˆä¸é”™"
+	                            "Õë²»´Á",
+	                            "ºÜ²»´í"
 	                        ]
 	                    }
 	                }
@@ -267,10 +270,10 @@ THOOK(BDS_Main, int, "main",
 		delete t;
 	}
 #endif
-	//å¦‚æœç›®å½•ä¸å­˜åœ¨åˆ›å»ºç›®å½•
+	//Èç¹ûÄ¿Â¼²»´æÔÚ´´½¨Ä¿Â¼
 	if (!fs::exists(PLUGIN_PATH))
 		fs::create_directories(PLUGIN_PATH);
-	//è®¾ç½®æ¨¡å—æœç´¢è·¯å¾„
+	//ÉèÖÃÄ£¿éËÑË÷Â·¾¶
 	wstring py_path(PLUGIN_PATH L";"
 					PLUGIN_PATH "Dlls;"
 					PLUGIN_PATH "Lib;"
@@ -278,24 +281,24 @@ THOOK(BDS_Main, int, "main",
 	py_path.append(Py_GetPath());
 	Py_SetPath(py_path.c_str());
 #if 0
-	//é¢„åˆå§‹åŒ–3.8+
+	//Ô¤³õÊ¼»¯3.8+
 	PyPreConfig cfg;
 	PyPreConfig_InitPythonConfig(&cfg);
 	cfg.utf8_mode = 1;
 	cfg.configure_locale = 0;
 	Py_PreInitialize(&cfg);
 #endif
-	//å¢åŠ ä¸€ä¸ªæ¨¡å—
+	//Ôö¼ÓÒ»¸öÄ£¿é
 	if((fopen("plugins/py/mc.py", "r")) == NULL)
 		PyImport_AppendInittab("mc", mc_init);
 	else
 		PyImport_AppendInittab("mco", mc_init);
-	//åˆå§‹åŒ–è§£é‡Šå™¨
+	//³õÊ¼»¯½âÊÍÆ÷
 	Py_InitializeEx(0);
-	//åˆå§‹åŒ–ç±»å‹
+	//³õÊ¼»¯ÀàĞÍ
 	if (PyType_Ready(&PyEntity_Type) < 0)
 		Py_FatalError("Can't initialize entity type");
-	//å¯ç”¨çº¿ç¨‹æ”¯æŒ
+	//ÆôÓÃÏß³ÌÖ§³Ö
 	PyEval_InitThreads();
 	for (auto& info : fs::directory_iterator(PLUGIN_PATH)) {
 		//whether the file is py
@@ -309,56 +312,56 @@ THOOK(BDS_Main, int, "main",
 			PrintPythonError();
 		}
 	}
-	// å¯åŠ¨å­çº¿ç¨‹å‰æ‰§è¡Œï¼Œä¸ºäº†é‡Šæ”¾PyEval_InitThreadsè·å¾—çš„å…¨å±€é”ï¼Œå¦åˆ™å­çº¿ç¨‹å¯èƒ½æ— æ³•è·å–åˆ°å…¨å±€é”ã€‚
+	// Æô¶¯×ÓÏß³ÌÇ°Ö´ĞĞ£¬ÎªÁËÊÍ·ÅPyEval_InitThreads»ñµÃµÄÈ«¾ÖËø£¬·ñÔò×ÓÏß³Ì¿ÉÄÜÎŞ·¨»ñÈ¡µ½È«¾ÖËø¡£
 	PyEval_ReleaseThread(PyThreadState_Get());
-	//é‡Šæ”¾å½“å‰çº¿ç¨‹
+	//ÊÍ·Åµ±Ç°Ïß³Ì
 	//PyEval_SaveThread();
-	//è¾“å‡ºç‰ˆæœ¬å·ä¿¡æ¯
+	//Êä³ö°æ±¾ºÅĞÅÏ¢
 	cout << "[BDSpyrunner] " << PYR_VERSION << " loaded." << endl;
 	return original(argc, argv, envp);
 }
-//Levelçš„æ„é€ å‡½æ•°				
+//LevelµÄ¹¹Ôìº¯Êı				
 THOOK(Level_construct, Level*, "??0Level@@QEAA@AEBV?$not_null@V?$NonOwnerPointer@VSoundPlayerInterface@@@Bedrock@@@gsl@@V?$unique_ptr@VLevelStorage@@U?$default_delete@VLevelStorage@@@std@@@std@@V?$unique_ptr@VLevelLooseFileStorage@@U?$default_delete@VLevelLooseFileStorage@@@std@@@4@AEAVIMinecraftEventing@@_NW4SubClientId@@AEAVScheduler@@V?$not_null@V?$NonOwnerPointer@VStructureManager@@@Bedrock@@@2@AEAVResourcePackManager@@AEBV?$not_null@V?$NonOwnerPointer@VIEntityRegistryOwner@@@Bedrock@@@2@V?$WeakRefT@UEntityRefTraits@@@@V?$unique_ptr@VBlockComponentFactory@@U?$default_delete@VBlockComponentFactory@@@std@@@4@V?$unique_ptr@VBlockDefinitionGroup@@U?$default_delete@VBlockDefinitionGroup@@@std@@@4@VItemRegistryRef@@V?$weak_ptr@VBlockTypeRegistry@@@4@4V?$optional@VDimensionDefinitionGroup@@@4@@Z",
 	Level* _this, uintptr_t a1, uintptr_t a2, uintptr_t a3, uintptr_t a4, uintptr_t a5, uintptr_t a6, uintptr_t a7, uintptr_t a8, uintptr_t a9, uintptr_t a10, uintptr_t a11, uintptr_t a12, uintptr_t a13, uintptr_t a14, uintptr_t a15, uintptr_t a16, uintptr_t a17) {
 	return global<Level> = original(_this, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17);
 }
-//SPSCQueueçš„æ„é€ å‡½æ•°
+//SPSCQueueµÄ¹¹Ôìº¯Êı
 THOOK(SPSCQueue_construct, SPSCQueue*, "??0?$SPSCQueue@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@$0CAA@@@QEAA@_K@Z",
 	SPSCQueue* _this) {
 	return global<SPSCQueue> = original(_this);
 }
-//RakPeerçš„æ„é€ å‡½æ•°
+//RakPeerµÄ¹¹Ôìº¯Êı
 THOOK(RakPeer_construct, RakPeer*, "??0RakPeer@RakNet@@QEAA@XZ",
 	RakPeer* _this) {
-	//ä¼šæ„é€ ä¸¤æ¬¡ï¼Œå–ç¬¬ä¸€æ¬¡å€¼
+	//»á¹¹ÔìÁ½´Î£¬È¡µÚÒ»´ÎÖµ
 	if (global<RakPeer> == nullptr) {
 		global<RakPeer> = original(_this);
 		return global<RakPeer>;
 	}
 	return original(_this);
 }
-//ServerNetworkHandlerçš„æ„é€ å‡½æ•°
+//ServerNetworkHandlerµÄ¹¹Ôìº¯Êı
 THOOK(ServerNetworkHandler_construct, uintptr_t, "??0ServerNetworkHandler@@QEAA@AEAVGameCallbacks@@AEBV?$NonOwnerPointer@VILevel@@@Bedrock@@AEAVNetworkHandler@@AEAVPrivateKeyManager@@AEAVServerLocator@@AEAVPacketSender@@AEAVAllowList@@PEAVPermissionsFile@@AEBVUUID@mce@@H_NAEBV?$vector@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@V?$allocator@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@2@@std@@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@HAEAVMinecraftCommands@@AEAVIMinecraftApp@@AEBV?$unordered_map@UPackIdVersion@@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@U?$hash@UPackIdVersion@@@3@U?$equal_to@UPackIdVersion@@@3@V?$allocator@U?$pair@$$CBUPackIdVersion@@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@std@@@3@@std@@AEAVScheduler@@V?$NonOwnerPointer@VTextFilteringProcessor@@@3@V?$optional_ref@VMinecraftGameTest@@@@V?$ServiceReference@VAppConfigs@@@@V?$ServiceReference@VMultiplayerServiceManager@Social@@@@9@Z",
 	ServerNetworkHandler* _this, uintptr_t a1, uintptr_t a2, uintptr_t a3, uintptr_t a4, uintptr_t a5, uintptr_t a6, uintptr_t a7, uintptr_t a8, uintptr_t a9, uintptr_t a10, uintptr_t a11, uintptr_t a12, uintptr_t a13, uintptr_t a14, uintptr_t a15, uintptr_t a16, uintptr_t a17, uintptr_t a18, uintptr_t a19, uintptr_t a20, uintptr_t a21, uintptr_t a22, uintptr_t a23) {
 	global<ServerNetworkHandler> = _this;
 	return original(_this, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17, a18, a19, a20, a21, a22, a23);
 }
-//Scoreboardçš„æ„é€ å‡½æ•°
+//ScoreboardµÄ¹¹Ôìº¯Êı
 THOOK(ServerScoreboard_construct, Scoreboard*, "??0ServerScoreboard@@QEAA@VCommandSoftEnumRegistry@@PEAVLevelStorage@@@Z",
 	Scoreboard* _this, uintptr_t a1, uintptr_t a2) {
 	return global<Scoreboard> = original(_this, a1, a2);
 }
-// Playeræ„é€ å‡½æ•°
+// Player¹¹Ôìº¯Êı
 THOOK(Player_construct, Player*, "??0Player@@QEAA@AEAVLevel@@AEAVPacketSender@@W4GameType@@AEBVNetworkIdentifier@@W4SubClientId@@VUUID@mce@@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@6V?$unique_ptr@VCertificate@@U?$default_delete@VCertificate@@@std@@@9@AEAVEntityContext@@66@Z",
 	void* _this, void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6, void* arg7, void* arg8, void* arg9, void* arg10, void* arg11, void* arg12) {
-	//ä¼šæ„é€ ä¸¤æ¬¡ï¼Œå–ç¬¬ä¸€æ¬¡å€¼
+	//»á¹¹ÔìÁ½´Î£¬È¡µÚÒ»´ÎÖµ
 	if (global<std::vector<Player*>> == nullptr)
 		global<std::vector<Player*>> = new std::vector<Player*>;
 	auto ret = original(_this, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
 	global<std::vector<Player*>>->push_back(ret);
 	return ret;
 }
-// Playerææ„å‡½æ•°
+// PlayerÎö¹¹º¯Êı
 THOOK(Player_destruct, Player*, "??1Player@@UEAA@XZ", Player* _this) {
 	for (std::vector<Player*>::iterator iter = global<std::vector<Player*>>->begin();
 		iter != global<std::vector<Player*>>->end(); iter++) {
@@ -369,7 +372,7 @@ THOOK(Player_destruct, Player*, "??1Player@@UEAA@XZ", Player* _this) {
 	}
 	return original(_this);
 }
-//æ”¹å˜è®¾ç½®å‘½ä»¤çš„å»ºç«‹ï¼Œç”¨äºæ³¨å†Œå‘½ä»¤
+//¸Ä±äÉèÖÃÃüÁîµÄ½¨Á¢£¬ÓÃÓÚ×¢²áÃüÁî
 THOOK(ChangeSettingCommand_setup, void, "?setup@ChangeSettingCommand@@SAXAEAVCommandRegistry@@@Z",
 	uintptr_t _this) {
 	for (auto& [cmd, des] : g_commands) {
@@ -380,14 +383,14 @@ THOOK(ChangeSettingCommand_setup, void, "?setup@ChangeSettingCommand@@SAXAEAVCom
 }
 #pragma endregion
 #pragma region Listener
-//å¼€æœå®Œæˆ
+//¿ª·şÍê³É
 THOOK(onServerStarted, void, "?startServerThread@ServerInstance@@QEAAXXZ",
 	uintptr_t _this) {
 	EventCallBackHelper h(EventCode::onServerStarted);
 	h.setArg(Py_None).call();
 	original(_this);
 }
-//æ§åˆ¶å°è¾“å‡ºï¼Œå®é™…ä¸Šæ˜¯ostrram::operator<<çš„åº•å±‚è°ƒç”¨
+//¿ØÖÆÌ¨Êä³ö£¬Êµ¼ÊÉÏÊÇostrram::operator<<µÄµ×²ãµ÷ÓÃ
 THOOK(onConsoleOutput, ostream&, "??$_Insert_string@DU?$char_traits@D@std@@_K@std@@YAAEAV?$basic_ostream@DU?$char_traits@D@std@@@0@AEAV10@QEBD_K@Z",
 	ostream& _this, const char* str, uintptr_t size) {
 	EventCallBackHelper h(EventCode::onConsoleOutput);
@@ -398,7 +401,7 @@ THOOK(onConsoleOutput, ostream&, "??$_Insert_string@DU?$char_traits@D@std@@_K@st
 	}
 	return original(_this, str, size);
 }
-//æ§åˆ¶å°è¾“å…¥ï¼Œå®é™…ä¸Šæ˜¯å‘½ä»¤é˜Ÿåˆ—çš„åº•å±‚
+//¿ØÖÆÌ¨ÊäÈë£¬Êµ¼ÊÉÏÊÇÃüÁî¶ÓÁĞµÄµ×²ã
 THOOK(onConsoleInput, bool, "??$inner_enqueue@$0A@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@?$SPSCQueue@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@$0CAA@@@AEAA_NAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z",
 	SPSCQueue* _this, string* cmd) {
 	EventCallBackHelper h(EventCode::onConsoleInput);
@@ -425,7 +428,7 @@ THOOK(onConsoleInput, bool, "??$inner_enqueue@$0A@AEBV?$basic_string@DU?$char_tr
 		return original(_this, cmd);
 	return false;
 }
-//ç©å®¶å¾…åŠ å…¥å‘åŒ…
+//Íæ¼Ò´ı¼ÓÈë·¢°ü
 THOOK(onPreJoin, void, "?sendLoginMessageLocal@ServerNetworkHandler@@QEAAXAEBVNetworkIdentifier@@AEBVConnectionRequest@@AEAVServerPlayer@@@Z",
 					   ServerNetworkHandler* _this, NetworkIdentifier* ni, void* a3, Player* sp) {
 	EventCallBackHelper h(EventCode::onPreJoin);
@@ -433,7 +436,7 @@ THOOK(onPreJoin, void, "?sendLoginMessageLocal@ServerNetworkHandler@@QEAAXAEBVNe
 	h.call();
 	original(_this, ni, a3, sp);
 }
-//ç©å®¶åŠ å…¥å‘åŒ…
+//Íæ¼Ò¼ÓÈë·¢°ü
 THOOK(onPlayerJoin, void, "?handle@ServerNetworkHandler@@UEAAXAEBVNetworkIdentifier@@AEBVSetLocalPlayerAsInitializedPacket@@@Z",
 	ServerNetworkHandler* _this, uintptr_t id,/*SetLocalPlayerAsInitializedPacket*/ uintptr_t pkt) {
 	EventCallBackHelper h(EventCode::onPlayerJoin);
@@ -443,7 +446,7 @@ THOOK(onPlayerJoin, void, "?handle@ServerNetworkHandler@@UEAAXAEBVNetworkIdentif
 	}
 	original(_this, id, pkt);
 }
-//ç©å®¶é€€å‡º
+//Íæ¼ÒÍË³ö
 THOOK(onPlayerLeft, void, "?_onPlayerLeft@ServerNetworkHandler@@AEAAXPEAVServerPlayer@@_N@Z",
 	uintptr_t _this, Player* p, char v3) {
 	EventCallBackHelper h(EventCode::onPlayerLeft);
@@ -479,7 +482,7 @@ THOOK(filterInventoryTransaction, void, "?handle@ServerNetworkHandler@@UEAAXAEBV
 	return original(_this, nid, packet);
 }
 
-//ä½¿ç”¨ç‰©å“
+//Ê¹ÓÃÎïÆ·
 THOOK(onUseItem, bool, "?useItemOn@GameMode@@UEAA_NAEAVItemStack@@AEBVBlockPos@@EAEBVVec3@@PEBVBlock@@@Z",
 	uintptr_t _this, ItemStack* item, BlockPos* bp, char a4, uintptr_t a5, Block* b) {
 	EventCallBackHelper h(EventCode::onUseItem);
@@ -512,7 +515,7 @@ THOOK(onUseItemEx, bool, "?baseUseItem@GameMode@@QEAA_NAEAVItemStack@@@Z",
 		return original(_this, item);
 	return false;
 }
-//æ”¾ç½®æ–¹å—
+//·ÅÖÃ·½¿é
 THOOK(onPlaceBlock, bool, "?mayPlace@BlockSource@@QEAA_NAEBVBlock@@AEBVBlockPos@@EPEAVActor@@_N@Z",
 	BlockSource* _this, Block* b, BlockPos* bp, unsigned char a4, Actor* p, bool _bool) {
 	EventCallBackHelper h(EventCode::onPlaceBlock);
@@ -528,7 +531,7 @@ THOOK(onPlaceBlock, bool, "?mayPlace@BlockSource@@QEAA_NAEBVBlock@@AEBVBlockPos@
 	}
 	return original(_this, b, bp, a4, p, _bool);
 }
-//å·²æ”¾ç½®æ–¹å—
+//ÒÑ·ÅÖÃ·½¿é
 THOOK(onPlacedBlock, void, "?sendBlockPlacedByPlayer@BlockEventCoordinator@@QEAAXAEAVPlayer@@AEBVBlock@@AEBVBlockPos@@_N@Z",
     uintptr_t _this, Player* p, Block* b, BlockPos* bp, bool _bool) {
 	EventCallBackHelper h(EventCode::onPlacedBlock);
@@ -543,7 +546,7 @@ THOOK(onPlacedBlock, void, "?sendBlockPlacedByPlayer@BlockEventCoordinator@@QEAA
 	}
 	original(_this, p, b, bp, _bool);
 }
-//ç ´åæ–¹å—
+//ÆÆ»µ·½¿é
 THOOK(onDestroyBlock, bool, "?checkBlockDestroyPermissions@BlockSource@@QEAA_NAEAVActor@@AEBVBlockPos@@AEBVItemStackBase@@_N@Z",
 	BlockSource* _this, Actor* a1, BlockPos* a2, ItemStack* a3, bool a4) {
 	EventCallBackHelper h(EventCode::onDestroyBlock);
@@ -559,7 +562,7 @@ THOOK(onDestroyBlock, bool, "?checkBlockDestroyPermissions@BlockSource@@QEAA_NAE
 	}
 	return original(_this, a1, a2, a3, a4);
 }
-//å¼€ç®±
+//¿ªÏä
 THOOK(onOpenChest, bool, "?use@ChestBlock@@UEBA_NAEAVPlayer@@AEBVBlockPos@@E@Z",
 	uintptr_t _this, Player* p, BlockPos* bp) {
 	EventCallBackHelper h(EventCode::onOpenChest);
@@ -570,7 +573,7 @@ THOOK(onOpenChest, bool, "?use@ChestBlock@@UEBA_NAEAVPlayer@@AEBVBlockPos@@E@Z",
 		return original(_this, p, bp);
 	return false;
 }
-//å¼€æ¡¶ï¼Œä¸èƒ½æ‹¦æˆªï¼Œæ‹¦æˆªè¯·çœ‹æ–¹å—äº¤äº’
+//¿ªÍ°£¬²»ÄÜÀ¹½Ø£¬À¹½ØÇë¿´·½¿é½»»¥
 THOOK(onOpenBarrel, bool, "?use@BarrelBlock@@UEBA_NAEAVPlayer@@AEBVBlockPos@@E@Z",
 	uintptr_t _this, Player* p, BlockPos* bp) {
 	EventCallBackHelper h(EventCode::onOpenBarrel);
@@ -581,7 +584,7 @@ THOOK(onOpenBarrel, bool, "?use@BarrelBlock@@UEBA_NAEAVPlayer@@AEBVBlockPos@@E@Z
 		return original(_this, p, bp);
 	return false;
 }
-//å…³ç®±
+//¹ØÏä
 THOOK(onCloseChest, void, "?stopOpen@ChestBlockActor@@UEAAXAEAVPlayer@@@Z",
 	uintptr_t _this, Player* p) {
 	//p->setPermissions(static_cast<PlayerPermissionLevel>(0));
@@ -593,7 +596,7 @@ THOOK(onCloseChest, void, "?stopOpen@ChestBlockActor@@UEAAXAEAVPlayer@@@Z",
 	if(h.call())
 		original(_this, p);
 }
-//å…³æ¡¶
+//¹ØÍ°
 THOOK(onCloseBarrel, void, "?stopOpen@BarrelBlockActor@@UEAAXAEAVPlayer@@@Z",
 	uintptr_t _this, Player* p) {
 	EventCallBackHelper h(EventCode::onCloseBarrel);
@@ -604,7 +607,7 @@ THOOK(onCloseBarrel, void, "?stopOpen@BarrelBlockActor@@UEAAXAEAVPlayer@@@Z",
 	if (h.call())
 		original(_this, p);
 }
-//æ”¾å…¥å–å‡ºç‰©å“ï¼Œå®é™…ä¸Šæ˜¯å®¹å™¨æ”¹å˜
+//·ÅÈëÈ¡³öÎïÆ·£¬Êµ¼ÊÉÏÊÇÈİÆ÷¸Ä±ä
 THOOK(onContainerChange, void, "?containerContentChanged@LevelContainerModel@@UEAAXH@Z",
 	uintptr_t _this, unsigned slot) {
 	EventCallBackHelper h(EventCode::onContainerChange);
@@ -614,7 +617,7 @@ THOOK(onContainerChange, void, "?containerContentChanged@LevelContainerModel@@UE
 	BlockPos* bp = reinterpret_cast<BlockPos*>(_this + 216);
 	BlockLegacy* bl = bs->getBlock(bp)->getBlockLegacy();
 	short bid = bl->getBlockItemID();
-	if (bid == 54 || bid == 130 || bid == 146 || bid == -203 || bid == 205 || bid == 218) {	//éç®±å­ã€æ¡¶ã€æ½œå½±ç›’çš„æƒ…å†µä¸ä½œå¤„ç†
+	if (bid == 54 || bid == 130 || bid == 146 || bid == -203 || bid == 205 || bid == 218) {	//·ÇÏä×Ó¡¢Í°¡¢Ç±Ó°ºĞµÄÇé¿ö²»×÷´¦Àí
 		uintptr_t v5 = (*reinterpret_cast<uintptr_t(**)(uintptr_t)>(Dereference<uintptr_t>(_this) + 160))(_this);
 		if (v5) {
 			ItemStack* item = (*reinterpret_cast<ItemStack * (**)(uintptr_t, uintptr_t)>(Dereference<uintptr_t>(v5) + 40))(v5, slot);
@@ -633,19 +636,31 @@ THOOK(onContainerChange, void, "?containerContentChanged@LevelContainerModel@@UE
 	}
 	original(_this, slot);
 }
-//ç©å®¶æ”»å‡»
+//Íæ¼Ò¹¥»÷
+float attackDamage = 0;
 THOOK(onAttack, bool, "?attack@Player@@UEAA_NAEAVActor@@AEBW4ActorDamageCause@@@Z",
 	Player* p, Actor* a, struct ActorDamageCause* c) {
-	//p->setPermissions(static_cast<PlayerPermissionLevel>(2));
 	EventCallBackHelper h(EventCode::onPlayerAttack);
-	h	
+	attackDamage = SymCall<float>("?calculateAttackDamage@Actor@@QEAAMAEAV1@@Z", p, a);
+	h
 		.insert("player", p)
-		.insert("actor", a);
+		.insert("actor", a)
+		.insert("damage", &attackDamage);
 	if (h.call())
 		return original(p, a, c);
 	return false;
 }
-//åˆ‡æ¢çº¬åº¦
+THOOK(onCalcDamage, float, "?calculateAttackDamage@Actor@@QEAAMAEAV1@@Z",
+	Actor* p, Actor* a) {
+	if (attackDamage == 0) {
+		return original(p, a);
+	} else {
+		float attackDamageTmp = attackDamage;
+		attackDamage = 0;
+		return attackDamageTmp;
+	}
+}
+//ÇĞ»»Î³¶È
 THOOK(onChangeDimension, bool, "?requestPlayerChangeDimension@Level@@UEAAXAEAVPlayer@@V?$unique_ptr@VChangeDimensionRequest@@U?$default_delete@VChangeDimensionRequest@@@std@@@std@@@Z",
 	uintptr_t _this, Player* p, uintptr_t req) {
 	EventCallBackHelper h(EventCode::onChangeDimension);
@@ -655,7 +670,7 @@ THOOK(onChangeDimension, bool, "?requestPlayerChangeDimension@Level@@UEAAXAEAVPl
 	}
 	return result;
 }
-//ç”Ÿç‰©æ­»äº¡
+//ÉúÎïËÀÍö
 THOOK(onMobDie, void, "?die@Mob@@UEAAXAEBVActorDamageSource@@@Z",
 	Mob* _this, uintptr_t dmsg) {
 	EventCallBackHelper h(EventCode::onMobDie);
@@ -670,11 +685,11 @@ THOOK(onMobDie, void, "?die@Mob@@UEAAXAEBVActorDamageSource@@@Z",
 	if (h.call())
 		original(_this, dmsg);
 }
-//ç”Ÿç‰©å—ä¼¤
+//ÉúÎïÊÜÉË
 THOOK(onMobHurt, bool, "?_hurt@Mob@@MEAA_NAEBVActorDamageSource@@M_N1@Z",
 	Mob* _this, uintptr_t dmsg, float a3, bool a4, bool a5) {
 	EventCallBackHelper h(EventCode::onMobHurt);
-	g_damage = a3;//å°†ç”Ÿç‰©å—ä¼¤çš„å€¼è®¾ç½®ä¸ºå¯è°ƒæ•´
+	g_damage = a3;//½«ÉúÎïÊÜÉËµÄÖµÉèÖÃÎª¿Éµ÷Õû
 	char v72;
 	// getSourceUniqueId
 	//v21 = (_QWORD *)(*(__int64 (__fastcall **)(const struct ActorDamageSource *, char *))(*(_QWORD *)a2 + 104i64))(a2, v30);
@@ -689,14 +704,14 @@ THOOK(onMobHurt, bool, "?_hurt@Mob@@MEAA_NAEBVActorDamageSource@@M_N1@Z",
 		return original(_this, dmsg, g_damage, a4, a5);
 	return false;
 }
-//ç©å®¶é‡ç”Ÿ
+//Íæ¼ÒÖØÉú
 THOOK(onRespawn, void, "?respawn@Player@@UEAAXXZ",
 	Player* p) {
 	EventCallBackHelper h(EventCode::onRespawn);
 	h.setArg(ToEntity(p)).call();
 	original(p);
 }
-//èŠå¤©ï¼Œæ¶ˆæ¯title msg wç­‰...
+//ÁÄÌì£¬ÏûÏ¢title msg wµÈ...
 THOOK(onChat, void, "?fireEventPlayerMessage@MinecraftEventing@@AEAAXAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@000@Z",
 	uintptr_t _this, string* sender, string* target, string* msg, string* style) {
 	EventCallBackHelper h(EventCode::onChat);
@@ -714,7 +729,7 @@ THOOK(onChat, void, "?fireEventPlayerMessage@MinecraftEventing@@AEAAXAEBV?$basic
 	}
 	original(_this, sender, target, msg, style);
 }
-//ç©å®¶è¾“å…¥æ–‡æœ¬
+//Íæ¼ÒÊäÈëÎÄ±¾
 THOOK(onInputText, void, "?handle@ServerNetworkHandler@@UEAAXAEBVNetworkIdentifier@@AEBVTextPacket@@@Z",
 	ServerNetworkHandler* _this, uintptr_t id, /*TextPacket*/uintptr_t pkt) {
 	EventCallBackHelper h(EventCode::onInputText);
@@ -728,7 +743,7 @@ THOOK(onInputText, void, "?handle@ServerNetworkHandler@@UEAAXAEBVNetworkIdentifi
 	}
 	original(_this, id, pkt);
 }
-//ç©å®¶è¾“å…¥å‘½ä»¤
+//Íæ¼ÒÊäÈëÃüÁî
 THOOK(onInputCommand, void, "?handle@ServerNetworkHandler@@UEAAXAEBVNetworkIdentifier@@AEBVCommandRequestPacket@@@Z",
 	ServerNetworkHandler* _this, uintptr_t id, /*CommandRequestPacket*/uintptr_t pkt) {
 	EventCallBackHelper h(EventCode::onInputCommand);
@@ -736,7 +751,7 @@ THOOK(onInputCommand, void, "?handle@ServerNetworkHandler@@UEAAXAEBVNetworkIdent
 	if (p) {
 		const string& cmd = Dereference<string>(pkt, 48);
 		auto data = g_commands.find(cmd.c_str() + 1);
-		//å¦‚æœæœ‰è¿™æ¡å‘½ä»¤ä¸”å›è°ƒå‡½æ•°ä¸ä¸ºnullptr
+		//Èç¹ûÓĞÕâÌõÃüÁîÇÒ»Øµ÷º¯Êı²»Îªnullptr
 		if (data != g_commands.end() && data->second.second) {
 			//Py_BEGIN_CALL;
 			PyObject_CallFunction(data->second.second, "O", ToEntity(p));
@@ -750,7 +765,7 @@ THOOK(onInputCommand, void, "?handle@ServerNetworkHandler@@UEAAXAEBVNetworkIdent
 			original(_this, id, pkt);
 	}
 }
-//ç©å®¶é€‰æ‹©è¡¨å•
+//Íæ¼ÒÑ¡Ôñ±íµ¥
 THOOK(onSelectForm, void, "?handle@?$PacketHandlerDispatcherInstance@VModalFormResponsePacket@@$0A@@@UEBAXAEBVNetworkIdentifier@@AEAVNetEventCallback@@AEAV?$shared_ptr@VPacket@@@std@@@Z",
 	uintptr_t _this, uintptr_t id, ServerNetworkHandler* handle, uintptr_t* ppkt) {
 	EventCallBackHelper h(EventCode::onSelectForm);
@@ -781,7 +796,7 @@ THOOK(onSelectForm, void, "?handle@?$PacketHandlerDispatcherInstance@VModalFormR
 	h.call();
 	original(_this, id, handle, ppkt);
 }
-//å‘½ä»¤æ–¹å—æ›´æ–°
+//ÃüÁî·½¿é¸üĞÂ
 THOOK(onCommandBlockUpdate, void, "?handle@ServerNetworkHandler@@UEAAXAEBVNetworkIdentifier@@AEBVCommandBlockUpdatePacket@@@Z",
 	ServerNetworkHandler* _this, uintptr_t id, /*CommandBlockUpdatePacket*/uintptr_t pkt) {
 	EventCallBackHelper h(EventCode::onCommandBlockUpdate);
@@ -809,7 +824,7 @@ THOOK(onCommandBlockUpdate, void, "?handle@ServerNetworkHandler@@UEAAXAEBVNetwor
 	}
 	original(_this, id, pkt);
 }
-//çˆ†ç‚¸
+//±¬Õ¨
 THOOK(onLevelExplode, bool, "?explode@Level@@UEAAXAEAVBlockSource@@PEAVActor@@AEBVVec3@@M_N3M3@Z",
 	Level* _this, BlockSource* bs, Actor* a3, Vec3 pos, float a5, bool a6, bool a7, float a8, bool a9) {
 	EventCallBackHelper h(EventCode::onLevelExplode);
@@ -822,13 +837,13 @@ THOOK(onLevelExplode, bool, "?explode@Level@@UEAAXAEAVBlockSource@@PEAVActor@@AE
 		return original(_this, bs, a3, pos, a5, a6, a7, a8, a9);
 	return false;
 }
-//å‘½ä»¤æ–¹å—æ‰§è¡Œ
+//ÃüÁî·½¿éÖ´ĞĞ
 THOOK(onCommandBlockPerform, bool, "?_execute@CommandBlock@@AEBAXAEAVBlockSource@@AEAVCommandBlockActor@@AEBVBlockPos@@_N@Z",
 	uintptr_t _this, BlockSource* a2, uintptr_t a3, BlockPos* bp, bool a5) {
 	EventCallBackHelper h(EventCode::onCommandBlockPerform);
-	//è„‰å†²:0,é‡å¤:1,é“¾:2
+	//Âö³å:0,ÖØ¸´:1,Á´:2
 	int mode = SymCall<int>("?getMode@CommandBlockActor@@QEBA?AW4CommandBlockMode@@AEAVBlockSource@@@Z", a3, a2);
-	//æ— æ¡ä»¶:0,æœ‰æ¡ä»¶:1
+	//ÎŞÌõ¼ş:0,ÓĞÌõ¼ş:1
 	bool condition = SymCall<bool>("?getConditionalMode@CommandBlockActor@@QEBA_NAEAVBlockSource@@@Z", a3, a2);
 	//SymCall<string&>("?getName@BaseCommandBlock@@QEBAAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ",
 	//	a3 + 200);
@@ -845,7 +860,7 @@ THOOK(onCommandBlockPerform, bool, "?_execute@CommandBlock@@AEBAXAEAVBlockSource
 		return original(_this, a2, a3, bp, a5);
 	return false;
 }
-//ç©å®¶ç§»åŠ¨
+//Íæ¼ÒÒÆ¶¯
 THOOK(onMove, void*, "??0MovePlayerPacket@@QEAA@AEBVPlayer@@W4PositionMode@1@HH@Z",
 	uintptr_t _this, Player* p, char a3, int a4, int a5) {
 	float speed = p->getSpeedInMetersPerSecond();
@@ -857,7 +872,7 @@ THOOK(onMove, void*, "??0MovePlayerPacket@@QEAA@AEBVPlayer@@W4PositionMode@1@HH@
 	}
 	return original(_this, p, a3, a4, a5);
 }
-//ç©å®¶ç©¿æˆ´
+//Íæ¼Ò´©´÷
 THOOK(onSetArmor, void, "?setArmor@Player@@UEAAXW4ArmorSlot@@AEBVItemStack@@@Z",
 	Player* p, unsigned slot, ItemStack* i) {
 	EventCallBackHelper h(EventCode::onSetArmor);
@@ -872,13 +887,13 @@ THOOK(onSetArmor, void, "?setArmor@Player@@UEAAXW4ArmorSlot@@AEBVItemStack@@@Z",
 		return original(p, slot, i);
 	return;
 }
-//è®¡åˆ†æ¿æ”¹å˜ç›‘å¬
+//¼Æ·Ö°å¸Ä±ä¼àÌı
 THOOK(onScoreChanged, void, "?onScoreChanged@ServerScoreboard@@UEAAXAEBUScoreboardId@@AEBVObjective@@@Z",
 	Scoreboard* _this, ScoreboardId* a1, Objective* a2) {
 	//cout << "ok" << endl;
 	// output ok but py plugin no output
-	//åˆ›å»ºè®¡åˆ†æ¿æ—¶ï¼š/scoreboard objectives <add|remove> <objectivename> dummy <objectivedisplayname>
-	//ä¿®æ”¹è®¡åˆ†æ¿æ—¶ï¼ˆæ­¤å‡½æ•°hookæ­¤å¤„)ï¼š/scoreboard players <add|remove|set> <playersname> <objectivename> <playersnum>
+	//´´½¨¼Æ·Ö°åÊ±£º/scoreboard objectives <add|remove> <objectivename> dummy <objectivedisplayname>
+	//ĞŞ¸Ä¼Æ·Ö°åÊ±£¨´Ëº¯Êıhook´Ë´¦)£º/scoreboard players <add|remove|set> <playersname> <objectivename> <playersnum>
 	EventCallBackHelper h(EventCode::onScoreChanged);
 	h.insert("scoreboardid", a1->id)
 		.insert("playersnum", a2->getPlayerScore(a1)->getCount())
@@ -887,7 +902,7 @@ THOOK(onScoreChanged, void, "?onScoreChanged@ServerScoreboard@@UEAAXAEBUScoreboa
 	h.call();
 	original(_this, a1, a2);
 }
-//è€•åœ°ç ´å
+//¸ûµØÆÆ»µ
 THOOK(onFallBlockTransform, void, "?transformOnFall@FarmBlock@@UEBAXAEAVBlockSource@@AEBVBlockPos@@PEAVActor@@M@Z",
 	uintptr_t _this, BlockSource* a1, BlockPos* a2, Actor* p, uintptr_t a4) {
 	EventCallBackHelper h(EventCode::onFallBlockTransform);
@@ -900,7 +915,7 @@ THOOK(onFallBlockTransform, void, "?transformOnFall@FarmBlock@@UEBAXAEAVBlockSou
 	}
 	original(_this, a1, a2, p, a4);
 }
-//ä½¿ç”¨é‡ç”Ÿé”š
+//Ê¹ÓÃÖØÉúÃª
 THOOK(onUseRespawnAnchorBlock, bool, "?trySetSpawn@RespawnAnchorBlock@@CA_NAEAVPlayer@@AEBVBlockPos@@AEAVBlockSource@@AEAVLevel@@@Z",
 	Player* p, BlockPos* a2, BlockSource* a3, Level* a4) {
 	EventCallBackHelper h(EventCode::onUseRespawnAnchorBlock);
@@ -911,7 +926,7 @@ THOOK(onUseRespawnAnchorBlock, bool, "?trySetSpawn@RespawnAnchorBlock@@CA_NAEAVP
 		return original(p, a2, a3, a4);
 	return false;
 }
-//æ´»å¡æ¨
+//»îÈûÍÆ
 THOOK(onPistonPush, bool, "?_attachedBlockWalker@PistonBlockActor@@AEAA_NAEAVBlockSource@@AEBVBlockPos@@EE@Z",
 	BlockActor* _this, BlockSource* bs, BlockPos* bp, unsigned a3, unsigned a4) {
 	EventCallBackHelper h(EventCode::onPistonPush);
@@ -928,7 +943,7 @@ THOOK(onPistonPush, bool, "?_attachedBlockWalker@PistonBlockActor@@AEAA_NAEAVBlo
 		return original(_this, bs, bp, a3, a4);
 	return false;
 }
-//æœ«å½±äººéšæœºä¼ é€ï¼ˆæ²¡äººä¼šç”¨å§ï¼Ÿï¼‰
+//Ä©Ó°ÈËËæ»ú´«ËÍ£¨Ã»ÈË»áÓÃ°É£¿£©
 THOOK(onEndermanRandomTeleport, bool, "?randomTeleport@TeleportComponent@@QEAA_NAEAVActor@@@Z",
 	uintptr_t _this, Actor* a1) {
 	EventCallBackHelper h(EventCode::onEndermanRandomTeleport);
@@ -937,7 +952,7 @@ THOOK(onEndermanRandomTeleport, bool, "?randomTeleport@TeleportComponent@@QEAA_N
 		return original(_this, a1);
 	return false;
 }
-//ä¸¢ç‰©å“
+//¶ªÎïÆ·
 THOOK(onDropItem, bool, "?drop@Player@@UEAA_NAEBVItemStack@@_N@Z",
 	Player* _this, ItemStack* a2, bool a3) {
 	EventCallBackHelper h(EventCode::onDropItem);
@@ -950,7 +965,7 @@ THOOK(onDropItem, bool, "?drop@Player@@UEAA_NAEBVItemStack@@_N@Z",
 		return original(_this, a2, a3);
 	return false;
 }
-//æ‹¿ç‰©å“
+//ÄÃÎïÆ·
 THOOK(onTakeItem, bool, "?take@Player@@QEAA_NAEAVActor@@HH@Z",
 	Player* _this, Actor* actor, int a2, int a3) {
 	EventCallBackHelper h(EventCode::onTakeItem);
@@ -960,7 +975,7 @@ THOOK(onTakeItem, bool, "?take@Player@@QEAA_NAEAVActor@@HH@Z",
 		return original(_this, actor, a2, a3);
 	return false;
 }
-//éª‘
+//Æï
 THOOK(onRide, bool, "?canAddPassenger@Actor@@UEBA_NAEAV1@@Z",
 	Actor* a1, Actor* a2) {
 	EventCallBackHelper h(EventCode::onRide);
@@ -970,7 +985,7 @@ THOOK(onRide, bool, "?canAddPassenger@Actor@@UEBA_NAEAV1@@Z",
 		return original(a1, a2);
 	return false;
 }
-//æ”¾å…¥å–å‡ºç‰©å“å±•ç¤ºæ¡†çš„ç‰©å“
+//·ÅÈëÈ¡³öÎïÆ·Õ¹Ê¾¿òµÄÎïÆ·
 THOOK(onUseFrameBlock, bool, "?use@ItemFrameBlock@@UEBA_NAEAVPlayer@@AEBVBlockPos@@E@Z",
 	uintptr_t _this, Player* a2, BlockPos* a3) {
 	EventCallBackHelper h(EventCode::onUseFrameBlock);
@@ -981,7 +996,7 @@ THOOK(onUseFrameBlock, bool, "?use@ItemFrameBlock@@UEBA_NAEAVPlayer@@AEBVBlockPo
 		return original(_this, a2, a3);
 	return false;
 }
-//ç‚¹å‡»ç‰©å“å±•ç¤ºæ¡†
+//µã»÷ÎïÆ·Õ¹Ê¾¿ò
 THOOK(onUseFrameBlock2, bool, "?attack@ItemFrameBlock@@UEBA_NPEAVPlayer@@AEBVBlockPos@@@Z",
 	uintptr_t _this, Player* a2, BlockPos* a3) {
 	EventCallBackHelper h(EventCode::onUseFrameBlock);
@@ -992,7 +1007,7 @@ THOOK(onUseFrameBlock2, bool, "?attack@ItemFrameBlock@@UEBA_NPEAVPlayer@@AEBVBlo
 		return original(_this, a2, a3);
 	return false;
 }
-//ç©å®¶è·³è·ƒ
+//Íæ¼ÒÌøÔ¾
 THOOK(onJump, void, "?jumpFromGround@Player@@UEAAXXZ",
 	Player* _this) {
 	EventCallBackHelper h(EventCode::onJump);
@@ -1000,7 +1015,7 @@ THOOK(onJump, void, "?jumpFromGround@Player@@UEAAXXZ",
 	if (h.call())
 		return original(_this);
 }
-//ç©å®¶æ½œè¡Œ
+//Íæ¼ÒÇ±ĞĞ
 THOOK(onSneak, void, "?sendActorSneakChanged@ActorEventCoordinator@@QEAAXAEAVActor@@_N@Z",
 	uintptr_t _this, Actor* a1, bool a2) {
 	EventCallBackHelper h(EventCode::onSneak);
@@ -1008,7 +1023,7 @@ THOOK(onSneak, void, "?sendActorSneakChanged@ActorEventCoordinator@@QEAAXAEAVAct
 	if (h.call())
 		return original(_this, a1, a2);
 }
-//ç«åŠ¿è”“å»¶
+//»ğÊÆÂûÑÓ
 THOOK(onFireSpread, bool, "?_trySpawnBlueFire@FireBlock@@AEBA_NAEAVBlockSource@@AEBVBlockPos@@@Z",
 	uintptr_t _this, BlockSource* bs, BlockPos* bp) {
 	EventCallBackHelper h(EventCode::onFireSpread);
@@ -1021,7 +1036,7 @@ THOOK(onFireSpread, bool, "?_trySpawnBlueFire@FireBlock@@AEBA_NAEAVBlockSource@@
 		return original(_this, bs, bp);
 	return false;
 }
-//æ–¹å—äº¤äº’ï¼ˆé™¤ç®±å­ï¼Œå·¥ä½œå°ï¼‰
+//·½¿é½»»¥£¨³ıÏä×Ó£¬¹¤×÷Ì¨£©
 THOOK(onBlockInteracted, void, "?onBlockInteractedWith@VanillaServerGameplayEventListener@@UEAA?AW4EventResult@@AEAVPlayer@@AEBVBlockPos@@@Z",
 	uintptr_t _this, Player* pl, BlockPos* bp) {
 	EventCallBackHelper h(EventCode::onBlockInteracted);
@@ -1035,7 +1050,7 @@ THOOK(onBlockInteracted, void, "?onBlockInteractedWith@VanillaServerGameplayEven
 	if (h.call())
 		return original(_this, pl, bp);
 }
-//æ–¹å—è¢«çˆ†ç‚¸ç ´å
+//·½¿é±»±¬Õ¨ÆÆ»µ
 THOOK(onBlockExploded, void, "?onExploded@Block@@QEBAXAEAVBlockSource@@AEBVBlockPos@@PEAVActor@@@Z",
 	Block* _this, BlockSource* bs, BlockPos* bp, Actor* actor) {
 	EventCallBackHelper h(EventCode::onBlockExploded);
@@ -1048,14 +1063,14 @@ THOOK(onBlockExploded, void, "?onExploded@Block@@QEBAXAEAVBlockSource@@AEBVBlock
 	if (h.call())
 		return original(_this, bs, bp, actor);
 }
-//ä½¿ç”¨ç‰Œå­
+//Ê¹ÓÃÅÆ×Ó
 THOOK(onUseSingBlock, uintptr_t, "?use@SignBlock@@UEBA_NAEAVPlayer@@AEBVBlockPos@@E@Z",
 	uintptr_t _this, Player* a1, BlockPos* a2) {
 	EventCallBackHelper h(EventCode::onUseSignBlock);
 	BlockSource* bs = a1->getRegion();
 	BlockActor* ba = bs->getBlockEntity(a2);
 	string text;
-	//è·å–æ²‰æµ¸å¼æ–‡æœ¬å†…å®¹
+	//»ñÈ¡³Á½şÊ½ÎÄ±¾ÄÚÈİ
 	SymCall<string&>("?getImmersiveReaderText@SignBlockActor@@UEAA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@AEAVBlockSource@@@Z",
 		ba, &text, bs);
 	h.insert("player", a1)
