@@ -378,6 +378,12 @@ void Player::sendInventroy() {
 		this, true);
 }
 
+
+void Player::openInventoryGUI(){
+	SymCall("?openInventory@ServerPlayer@@UEAAXXZ",
+		this);
+}
+
 //刷新区块
 
 void Player::resendAllChunks() {
@@ -456,3 +462,12 @@ void Player::sendSetScorePacket(char type, const vector<ScorePacketInfo>& slot) 
 	sendNetworkPacket(pkt);
 }
 
+// not working
+void Player::sendCloseContainerPacket() {
+	static unsigned char id = 0;
+	uintptr_t pkt = createPacket(47);
+	pkt = SymCall<uintptr_t>("??0ContainerClosePacket@@QEAA@W4ContainerID@@_N@Z",
+		pkt, ++id, 0);
+	sendNetworkPacket(pkt);
+
+}

@@ -32,114 +32,116 @@ struct UserEntityIdentifierComponent {
 	struct Certificate* cert;
 };
 struct Actor {
-	//»ñÈ¡ÉúÎïÃû³ÆĞÅÏ¢
+	//ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
 	std::string getNameTag();
-	//ÉèÖÃÉúÎïÃû³ÆĞÅÏ¢
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
 	void setNameTag(const std::string&);
-	//ÉèÖÃÉúÎïÃû³ÆÊÇ·ñ¿É¼û
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½É¼ï¿½
 	void setNameTagVisible(bool visible);
-	//»ñÈ¡ÉúÎïµ±Ç°Ëù´¦Î¬¶ÈID
+	//ï¿½ï¿½È¡ï¿½ï¿½ï¿½ïµ±Ç°ï¿½ï¿½ï¿½ï¿½Î¬ï¿½ï¿½ID
 	int getDimensionId();
-	//»ñÈ¡ÉúÎïµ±Ç°ËùÔÚ×ø±ê
+	//ï¿½ï¿½È¡ï¿½ï¿½ï¿½ïµ±Ç°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	Vec3* getPos();
-	//»ñÈ¡ÉúÎïÖ®Ç°ËùÔÚ×ø±ê
+	//ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½Ö®Ç°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	Vec3* getPosPrev();
-	//»ñÈ¡ÉúÎï×ø±êµÄ±ä»¯Á¿
+	//ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä±ä»¯ï¿½ï¿½
 	//Vec3* getPosDelta();
-	//»ñÈ¡ËÙ¶È
+	//ï¿½ï¿½È¡ï¿½Ù¶ï¿½
 	float getSpeedInMetersPerSecond();
-	//ÊÇ·ñĞü¿Õ
+	//ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½
 	bool isStanding();
-	//ÊÇ·ñÇ±ĞĞ
+	//ï¿½Ç·ï¿½Ç±ï¿½ï¿½
 	bool isSneaking();
-	//È¡·½¿éÔ´
+	//È¡ï¿½ï¿½ï¿½ï¿½Ô´
 	BlockSource* getRegion();
 	ItemStack* getArmor(int slot);
-	//»ñÈ¡ÊµÌåÀàĞÍ
+	//ï¿½ï¿½È¡Êµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	unsigned getEntityTypeId();
-	//»ñÈ¡²éÑ¯ÓÃID
+	//ï¿½ï¿½È¡ï¿½ï¿½Ñ¯ï¿½ï¿½ID
 	uintptr_t getUniqueID();
-	//»ñÈ¡ÊµÌåÀàĞÍ
+	//ï¿½ï¿½È¡Êµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	std::string getEntityTypeName();
-	//ÊôĞÔ
+	//ï¿½ï¿½ï¿½ï¿½
 	uintptr_t updateAttrs();
 	uintptr_t getAttrs(void* a2);
 	float getCurrentValue(uintptr_t attr);
 	float getMaxValue(uintptr_t attr);
 	void setCurrentValue(uintptr_t attr, float value);
 	void setMaxValue(uintptr_t attr, float value);
-	//»ñÈ¡µØÍ¼ĞÅÏ¢
+	//ï¿½ï¿½È¡ï¿½ï¿½Í¼ï¿½ï¿½Ï¢
 	Level* getLevel();
-	//Ìí¼ÓÒ»¸ö×´Ì¬
+	//ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½×´Ì¬
 	uintptr_t addEffect(uintptr_t ef);
-	//ÉúÃüÖµ
+	//ï¿½ï¿½ï¿½ï¿½Öµ
 	float getHealth();
 	float getMaxHealth();
 	void setHealth(float value);
 	void setMaxHealth(float value);
-	//»ñÈ¡¸±ÊÖ
+	//ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½
 	ItemStack* getOffhandSlot();
 	Tag* save();
-	//ÉèÖÃ´óĞ¡
+	//ï¿½ï¿½ï¿½Ã´ï¿½Ğ¡
 	void setSize(float f1, float f2);
-	//»ñÈ¡×´Ì¬ÁĞ±í
+	//ï¿½ï¿½È¡×´Ì¬ï¿½Ğ±ï¿½
 	auto getAllEffects();
-	//´«ËÍ
+	//ï¿½ï¿½ï¿½ï¿½
 	void teleport(Vec3* target, int did);
-	//ĞÂÔö±êÇ©
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç©
 	bool addTag(const std::string& str);
-	//ÒÆ³ı±êÇ©
+	//ï¿½Æ³ï¿½ï¿½ï¿½Ç©
 	bool removeTag(const std::string& str);
-	//»ñÈ¡±êÇ©
+	//ï¿½ï¿½È¡ï¿½ï¿½Ç©
 	span<std::string> getTags();
-	//É±ËÀÊµÌå
+	//É±ï¿½ï¿½Êµï¿½ï¿½
 	void kill();
 };
 struct Mob : Actor {};
 struct Player : Mob {
-	//»ñÈ¡Íæ¼ÒÉí·İÊı¾İ
+	//ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	UserEntityIdentifierComponent* getUserEntityIdentifierComponent();
-	//»ñÈ¡Íæ¼Òuuid
+	//ï¿½ï¿½È¡ï¿½ï¿½ï¿½uuid
 	std::string getUuid();
-	//»ñÈ¡Íæ¼Òxuid
+	//ï¿½ï¿½È¡ï¿½ï¿½ï¿½xuid
 	std::string getXuid();
-	//»ñÈ¡ÍøÂç±êÊ¶·û
+	//ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½Ê¶ï¿½ï¿½
 	NetworkIdentifier* getClientId();
-	//»ñÈ¡±³°ü
+	//ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½
 	Container* getInventory();
-	//»ñÈ¡×°±¸ÈİÆ÷
+	//ï¿½ï¿½È¡×°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	Container* getArmorContainer();
-	//»ñÈ¡Ä©Ó°Ïä
+	//ï¿½ï¿½È¡Ä©Ó°ï¿½ï¿½
 	Container* getEnderChestContainer();
-	//ÉèÖÃÒ»¸ö×°±¸
+	//ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½×°ï¿½ï¿½
 	uintptr_t setArmor(int i, ItemStack* item);
-	//ÉèÖÃ¸±ÊÖ
+	//ï¿½ï¿½ï¿½Ã¸ï¿½ï¿½ï¿½
 	uintptr_t setOffhandSlot(ItemStack* item);
-	//Ìí¼ÓÒ»¸öÎïÆ·
+	//ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Æ·
 	void addItem(ItemStack* item);
-	//Ôö¼ÓµÈ¼¶
+	//ï¿½ï¿½ï¿½ÓµÈ¼ï¿½
 	void addLevel(int level);
-	//»ñÈ¡µ±Ç°Ñ¡ÖĞµÄ¿òÎ»ÖÃ
+	//ï¿½ï¿½È¡ï¿½ï¿½Ç°Ñ¡ï¿½ĞµÄ¿ï¿½Î»ï¿½ï¿½
 	int getSelectedItemSlot();
-	//»ñÈ¡µ±Ç°ÎïÆ·
+	//ï¿½ï¿½È¡ï¿½ï¿½Ç°ï¿½ï¿½Æ·
 	ItemStack* getSelectedItem();
-	//»ñÈ¡±³°üÎïÆ·
+	//ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ·
 	ItemStack* getInventoryItem(int slot);
-	//»ñÈ¡ÓÎÍæÈ¨ÏŞ
+	//ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½È¨ï¿½ï¿½
 	PlayerPermissionLevel getPlayerPermissionLevel();
-	//ÉèÖÃÓÎÏ·Ê±ÓÎÍæÈ¨ÏŞ
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï·Ê±ï¿½ï¿½ï¿½ï¿½È¨ï¿½ï¿½
 	void setPermissions(PlayerPermissionLevel m);
-	//»ñÈ¡Íæ¼ÒÄÜÁ¦
+	//ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	Abilities* getAbilities();
-	//»ñÈ¡Éè±¸id
+	//ï¿½ï¿½È¡ï¿½è±¸id
 	std::string getPlatformOnlineId();
-	//»ñÈ¡Éè±¸ÏµÍ³ÀàĞÍ
+	//ï¿½ï¿½È¡ï¿½è±¸ÏµÍ³ï¿½ï¿½ï¿½ï¿½
 	unsigned getPlatform();
-	//·¢ËÍ±³°ü
+	//ï¿½ï¿½ï¿½Í±ï¿½ï¿½ï¿½
 	void sendInventroy();
-	//Ë¢ĞÂÇø¿é
+	void openInventoryGUI();
+	/*bad*/void closeContainerGUI();
+	//Ë¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	void resendAllChunks();
-	//·¢ËÍÊı¾İ°ü
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½İ°ï¿½
 	void sendNetworkPacket(uintptr_t pkt);
 	unsigned sendModalFormRequestPacket(const std::string& str);
 	void sendTransferPacket(const std::string& address, unsigned short port);
@@ -149,8 +151,9 @@ struct Player : Mob {
 	void sendBossEventCodePacket(std::string name, float per, int eventtype);
 	void sendsetDisplayObjectivePacket(const std::string& title, const std::string& name = "name");
 	void sendSetScorePacket(char type, const std::vector<ScorePacketInfo>& slot);
+	void sendCloseContainerPacket();
 };
-//ÊÇ·ñÎªÍæ¼Ò
+//ï¿½Ç·ï¿½Îªï¿½ï¿½ï¿½
 inline bool IsPlayer(Actor* ptr) {
 	if (ptr == nullptr)
 		return false;
@@ -158,7 +161,7 @@ inline bool IsPlayer(Actor* ptr) {
 		return false;
 	return true;
 }
-//Íæ¼ÒÊÇ·ñÒÑ³õÊ¼»¯
+//ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½Ñ³ï¿½Ê¼ï¿½ï¿½
 inline bool IsPlayerInit(Actor* ptr) {
 	//ServerPlayer::isPlayerInitialized  !*((_BYTE *)this + 9648)
 	if (!*((char*)ptr + 9648))
