@@ -1,6 +1,7 @@
 .vs/
+.vscode/
 x64/
 *.user
-/pyTools/cvdump.exe
-/pyTools/pdbInfo.txt
+./tools/cvdump.exe
+./tools/symbols.txt
 BDSpyrunner.vcxproj

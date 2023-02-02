@@ -63,9 +63,9 @@ jobs:
           cp ./x64/${{ inputs.solution }}/BDSpyrunner.pdb ./x64/dllpdb/
           cp ./x64/${{ inputs.solution }}/BDSpyrunner.dll ./release/
           cp ./x64/${{ inputs.solution }}/BDSpyrunner.pdb ./release/
-          cp ./pyTools/mc.py ./release/
-          cp ./pyTools/test.py ./release/
-          cp ./pyTools/symchk.py ./release/
+          cp ./tools/mc.py ./release/
+          cp ./tools/test.py ./release/
+          cp ./tools/symchk.py ./release/
           ls ./x64/dllpdb/
           ls ./release/
 
