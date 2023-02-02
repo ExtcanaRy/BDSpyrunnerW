@@ -176,13 +176,13 @@ def compare():
             pbar.write(
                 f"{Fore.GREEN}Found symbol at {result['pos']} {result['time']}:")
             pbar.write(f"{result['sym']}{Fore.RESET}")
-            pbar.write(f"{Fore.BLACK}Key words: {', '.join(result['keywords'])}{Fore.RESET}")
+            pbar.write(f"{Fore.MAGENTA}Key words: {', '.join(result['keywords'])}{Fore.RESET}")
         elif len(result) == 5:
             similar_syms = '\n'.join(result['similar_syms'])
             pbar.write(
                 f"{Fore.RED}Missing symbol at file {result['pos']} {result['time']}{Fore.RESET}")
             pbar.write(f"{Fore.YELLOW}{result['sym']}{Fore.RESET}")
-            pbar.write(f"{Fore.BLACK}Key words: {', '.join(result['keywords'])}{Fore.RESET}")
+            pbar.write(f"{Fore.MAGENTA}Key words: {', '.join(result['keywords'])}{Fore.RESET}")
             pbar.write(
                 f"{Fore.GREEN}Similar symbols in symbol file:{Fore.RESET}")
             pbar.write(f"{Fore.LIGHTBLUE_EX}{similar_syms}{Fore.RESET}\n")
