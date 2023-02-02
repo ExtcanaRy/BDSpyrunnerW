@@ -2,6 +2,6 @@
 .vscode/
 x64/
 *.user
-./tools/cvdump.exe
-./tools/symbols.txt
 BDSpyrunner.vcxproj
+tools/symbols.txt
+tools/cvdump.exe

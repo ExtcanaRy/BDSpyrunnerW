@@ -1,17 +1,22 @@
 import os
 import re
 import time
-import chardet
-import argparse
-import pefile
-import requests
-import colorama
 import difflib
-from fastread import Fastread
+import argparse
 import multiprocessing as mp
-from tqdm import tqdm
-from colorama import Fore
 
+try:
+    import pefile
+    import chardet
+    import requests
+    import colorama
+
+    from fastread import Fastread
+    from tqdm import tqdm
+    from colorama import Fore
+except ModuleNotFoundError:
+    if input("Install requirements with: pip install pefile chardet requests colorama fastread tqdm ? [y/n]") == "y":
+        os.system("pip install pefile chardet requests colorama fastread tqdm")
 
 def is_executable(filename) -> bool:
     try:
@@ -167,15 +172,17 @@ def compare():
     missing_count = 0
     for index in range(len(plugin_symbols)):
         result = parent_conn.recv()
-        if len(result) == 3:
+        if len(result) == 4:
             pbar.write(
                 f"{Fore.GREEN}Found symbol at {result['pos']} {result['time']}:")
             pbar.write(f"{result['sym']}{Fore.RESET}")
-        elif len(result) == 4:
+            pbar.write(f"{Fore.BLACK}Key words: {', '.join(result['keywords'])}{Fore.RESET}")
+        elif len(result) == 5:
             similar_syms = '\n'.join(result['similar_syms'])
             pbar.write(
                 f"{Fore.RED}Missing symbol at file {result['pos']} {result['time']}{Fore.RESET}")
             pbar.write(f"{Fore.YELLOW}{result['sym']}{Fore.RESET}")
+            pbar.write(f"{Fore.BLACK}Key words: {', '.join(result['keywords'])}{Fore.RESET}")
             pbar.write(
                 f"{Fore.GREEN}Similar symbols in symbol file:{Fore.RESET}")
             pbar.write(f"{Fore.LIGHTBLUE_EX}{similar_syms}{Fore.RESET}\n")
@@ -193,22 +200,35 @@ def compare_tsk(pdb_symbols, plugin_symbols, verbose_mode, similar_ratio, conn):
     for symbol in plugin_symbols:
         start_time = time.time()
         if symbol not in pdb_symbols:
-            similar_symbols = []
-            
+            similar_symbols = {}
+            keywords = []
+            first_keyword = re.search(r'[a-z]+[^@]*', symbol).group()
+            keywords = re.findall(r'[A-Z][a-z]+(?:[A-Z][a-z]+)*', symbol)[:5]
+            if keywords[0] in first_keyword:
+                keywords[0] = first_keyword
+            keywords = list(set([keyword for keyword in keywords if len(keyword) >= 5]))
+
             for pdb_symbol in pdb_symbols:
-                if symbol[:symbol.find("@@")] in pdb_symbol:
-                    similar_symbols.append(pdb_symbol)
+                if first_keyword in pdb_symbol:
+                    similarity = difflib.SequenceMatcher(
+                        None, symbol, pdb_symbol).quick_ratio()
+                    similar_symbols[pdb_symbol] = similarity
             if len(similar_symbols) > 5 or len(similar_symbols) == 0:
-                similar_symbols = []
+                similar_symbols = {}
                 for pdb_symbol in pdb_symbols:
-                    if symbol[:symbol.find("@@")] == pdb_symbol[:symbol.find("@@")]:
-                        similarity = difflib.SequenceMatcher(None, symbol, pdb_symbol).quick_ratio()
-                        if similarity >= similar_ratio:
-                            similar_symbols.append(pdb_symbol)
-            conn.send(
-                {'pos': plugin_symbols[symbol], 'sym': symbol, 'similar_syms': similar_symbols, 'time': f"{timer(start_time, time.time())}"})
+                    if not all(keyword in pdb_symbol for keyword in keywords):
+                        continue
+                    similarity = difflib.SequenceMatcher(
+                        None, symbol, pdb_symbol).quick_ratio()
+                    if similarity >= similar_ratio:
+                        similar_symbols[pdb_symbol] = similarity
+
+            similar_symbols = sorted(similar_symbols.items(), key=lambda x: x[1], reverse=True)
+            similar_symbols = [f"[{str(value*100)[:5]}%] {key}" for key, value in similar_symbols]
+            conn.send({'pos': plugin_symbols[symbol], 'sym': symbol, 'keywords': keywords, 
+                 'similar_syms': similar_symbols[:10], 'time': f"{timer(start_time, time.time())}"})
         elif verbose_mode:
-            conn.send({'pos': plugin_symbols[symbol], 'sym': symbol,
+            conn.send({'pos': plugin_symbols[symbol], 'sym': symbol, 'keywords': keywords,
                       'time': f"{timer(start_time, time.time())}"})
         else:
             conn.send({'time': f"{timer(start_time, time.time())}"})
