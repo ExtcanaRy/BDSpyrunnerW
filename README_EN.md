@@ -1,8 +1,8 @@
 ﻿# BDSpyrunner
 
-![Liscense](https://img.shields.io/github/license/twoone-3/BDSpyrunner)
-![Downloads](https://img.shields.io/github/downloads/twoone-3/BDSpyrunner/total)
-![BDS](https://img.shields.io/badge/support--BDS--version-1.19.51.01-blue)
+![Liscense](https://img.shields.io/github/license/WillowSauceR/BDSpyrunner)
+![Downloads](https://img.shields.io/github/downloads/WillowSauceR/BDSpyrunner/total)
+![BDS](https://img.shields.io/badge/BDS-1.19.52.01-blue)
 
 [简体中文](README.md) | English
 

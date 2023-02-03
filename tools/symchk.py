@@ -17,6 +17,7 @@ try:
 except ModuleNotFoundError:
     if input("Install requirements with: pip install pefile chardet requests colorama fastread tqdm ? [y/n]") == "y":
         os.system("pip install pefile chardet requests colorama fastread tqdm")
+    os._exit(1)
 
 def is_executable(filename) -> bool:
     try:
@@ -86,9 +87,14 @@ def read_pdb_symbols(file_path) -> list:
 
     pdb_symbols = []
     lines = Fastread(file_path).lines()
-    for index, line in enumerate(lines):
-        if "?" in line and "Z" in line:
-            pdb_symbols.append(line[43:-1])
+    if linux:
+        for index, line in enumerate(lines):
+            if "_Z" in line:
+                pdb_symbols.append(line[line.find("_Z"):-1])
+    else:
+        for index, line in enumerate(lines):
+            if "?" in line and "Z" in line:
+                pdb_symbols.append(line[43:-1])
     printc(
         f"Loaded {len(pdb_symbols)} symbols from pdb file ({str(time.time()-start_time)[:5]})s!", Fore.GREEN)
     return pdb_symbols
@@ -234,6 +240,10 @@ def compare_tsk(pdb_symbols, plugin_symbols, verbose_mode, similar_ratio, conn):
             conn.send({'time': f"{timer(start_time, time.time())}"})
 
 
+def compare_tsk_linux():
+    pass
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("pdb_file_path", help="the path to the pdb file")
@@ -246,6 +256,8 @@ if __name__ == "__main__":
                         help="enable verbose mode")
     parser.add_argument("-o", "--overwrite", action="store_true",
                         help="overwrite the cache")
+    parser.add_argument("-l", "--linux", action="store_true",
+                        help="using linux edition")
 
     args = parser.parse_args()
 
@@ -254,6 +266,7 @@ if __name__ == "__main__":
     verbose_mode = args.verbose
     overwrite = args.overwrite
     similar_ratio = args.similar_ratio
+    linux = args.linux
 
     #os.system("del /f /q symbols.txt")
     printc("\nSymbol Checker For BDS Projects\n", Fore.LIGHTCYAN_EX)

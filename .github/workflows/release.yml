@@ -26,12 +26,12 @@ on:
       rel_title:
         description: 'Release Description Title'     
         required: false
-        default: 'v1.9.50a'
+        default: 'v1.19.52a'
         type: string
       rel_tag:
         description: 'Release Tag'     
         required: false
-        default: 'v1.9.50a'
+        default: 'v1.19.52a'
         type: string
       rel_desc_body:
         description: 'Release Description Body'     

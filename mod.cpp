@@ -649,11 +649,6 @@ THOOK(onPlayerInventoryChange, void, "?containerContentChanged@HudContainerModel
 	}
 	original(_this, slot);
 }
-// for test
-THOOK(containerClosePacket, uintptr_t, "??0ContainerClosePacket@@QEAA@W4ContainerID@@_N@Z",
-	uintptr_t a1, char a2, char a3) {
-	return original(a1, a2, a3);
-}
 // player attack
 float attackDamage = 0;
 THOOK(onAttack, bool, "?attack@Player@@UEAA_NAEAVActor@@AEBW4ActorDamageCause@@@Z",
