@@ -174,7 +174,7 @@ def save_conf(folder:str, filename:str, config={}, encoding="utf-8"):
 
 def make_conf(folder:str, filename:str, config={}, encoding="utf-8"):
     if not os.path.exists(f"plugins/py/{folder}/{filename}"):
-        os.makedirs(f"plugins/py/{folder}")
+        os.makedirs(f"plugins/py/{folder}", exist_ok=True)
         save_conf(folder, filename, config, encoding)
         return True
     else:
