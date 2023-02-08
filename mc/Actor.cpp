@@ -32,7 +32,7 @@ void Actor::setNameTagVisible(bool visible) {
 
 int Actor::getDimensionId() {
 	int did;
-	SymCall("?getDimensionId@Actor@@UEBA?AV?$AutomaticID@VDimension@@H@@XZ",
+	SymCall("?getDimensionId@Actor@@QEBA?AV?$AutomaticID@VDimension@@H@@XZ",
 		this, &did);
 	return did;
 }
@@ -76,7 +76,7 @@ bool Actor::isSneaking() {
 //取方块源
 
 BlockSource* Actor::getRegion() {
-	return SymCall<BlockSource*>("?getRegion@Actor@@QEBAAEAVBlockSource@@XZ", this);
+	return SymCall<BlockSource*>("?getDimensionBlockSourceConst@Actor@@QEBAAEBVBlockSource@@XZ", this);
 	//return Dereference<BlockSource*, this + 872);//IDA Actor::getRegion
 }
 
@@ -134,7 +134,7 @@ void Actor::setMaxValue(uintptr_t attr, float value) {
 
 //获取地图信息
 Level* Actor::getLevel() {
-	return SymCall<Level*>("?getLevel@Actor@@QEBAAEBVLevel@@XZ", this);
+	return SymCall<Level*>("?getCamera@Item@@UEBAPEAVICameraItemComponent@@XZ", this);
 }
 
 //添加一个状态
@@ -220,7 +220,7 @@ bool Actor::removeTag(const string& str) {
 
 span<string> Actor::getTags() {
 	span<string> tags;
-	SymCall<span<string>&>("?getTags@Actor@@QEBA?BV?$span@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@$0?0@gsl@@XZ",
+	SymCall<span<string>&>("?getTags@Actor@@QEBA?BV?$vector@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@V?$allocator@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@2@@std@@XZ",
 		this, &tags);
 	return tags;
 }
@@ -284,8 +284,8 @@ Container* Player::getArmorContainer() {
 //获取末影箱
 
 Container* Player::getEnderChestContainer() {
-	//IDA Player::Player Line761: v69 = (EnderChestContainer **)((char *)v15 + 5232);
-	return Dereference<Container*>(this, 5232);
+	//IDA Player::Player Line751: v72 = (char *)this + 3792;
+	return Dereference<Container*>(this, 3792);
 }
 
 //设置一个装备
@@ -305,8 +305,12 @@ uintptr_t Player::setOffhandSlot(ItemStack* item) {
 //添加一个物品
 
 void Player::addItem(ItemStack* item) {
-	SymCall<uintptr_t>("?addItem@@YAXAEAVPlayer@@AEAVItemStack@@@Z",
-		this, item);
+	// waiting for fix, test console commands:
+	// pydebug
+	// import json, mc
+	// mc.getPlayerList()[0].addItem(json.dumps({"Count1":1,"Damage2":0,"Name8":"minecraft:netherite_sword","WasPickedUp1":0}))
+	SymCall("?addItem@PlayerUtils@@YAXAEAVPlayer@@AEAVItemStack@@@Z",
+		this->getLevel(), this, item);
 }
 
 //增加等级
