@@ -91,7 +91,7 @@ struct Player : Mob {
 	unsigned getPlatform();
 	void sendInventroy();
 	void openInventoryGUI();
-	/*bad*/void closeContainerGUI();
+	void doDeleteContainerManager();
 	void resendAllChunks();
 	void sendNetworkPacket(uintptr_t pkt);
 	unsigned sendModalFormRequestPacket(const std::string& str);
@@ -102,7 +102,6 @@ struct Player : Mob {
 	void sendBossEventCodePacket(std::string name, float per, int eventtype);
 	void sendsetDisplayObjectivePacket(const std::string& title, const std::string& name = "name");
 	void sendSetScorePacket(char type, const std::vector<ScorePacketInfo>& slot);
-	void sendCloseContainerPacket();
 };
 inline bool IsPlayer(Actor* ptr) {
 	if (ptr == nullptr)

@@ -466,12 +466,8 @@ void Player::sendSetScorePacket(char type, const vector<ScorePacketInfo>& slot) 
 	sendNetworkPacket(pkt);
 }
 
-// not working
-void Player::sendCloseContainerPacket() {
-	static unsigned char id = 0;
-	uintptr_t pkt = createPacket(47);
-	pkt = SymCall<uintptr_t>("??0ContainerClosePacket@@QEAA@W4ContainerID@@_N@Z",
-		pkt, ++id, 0);
-	sendNetworkPacket(pkt);
-
+// May not close the GUI, but will definitely close the container, after closing the player can not operate the container
+void Player::doDeleteContainerManager() {
+	SymCall("?doDeleteContainerManager@ServerPlayer@@QEAAX_N@Z",
+		this, false);
 }

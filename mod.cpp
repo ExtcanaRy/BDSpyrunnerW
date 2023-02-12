@@ -902,12 +902,10 @@ THOOK(onSetArmor, void, "?setArmor@Player@@UEAAXW4ArmorSlot@@AEBVItemStack@@@Z",
 	return;
 }
 // scoreboard objective changed
+//when create scoreboard：/scoreboard objectives <add|remove> <objectivename> dummy <objectivedisplayname>
+//when modify scoreboard(this func hook here)：/scoreboard players <add|remove|set> <playersname> <objectivename> <playersnum>
 THOOK(onScoreChanged, void, "?onScoreChanged@ServerScoreboard@@UEAAXAEBUScoreboardId@@AEBVObjective@@@Z",
 	Scoreboard* _this, ScoreboardId* a1, Objective* a2) {
-	//cout << "ok" << endl;
-	// output ok but py plugin no output
-	//创建计分板时：/scoreboard objectives <add|remove> <objectivename> dummy <objectivedisplayname>
-	//修改计分板时（此函数hook此处)：/scoreboard players <add|remove|set> <playersname> <objectivename> <playersnum>
 	EventCallBackHelper h(EventCode::onScoreChanged);
 	h.insert("scoreboardid", a1->id)
 		.insert("playersnum", a2->getPlayerScore(a1)->getCount())

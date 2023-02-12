@@ -362,7 +362,7 @@ PyObject* PyEntity_CloseContainerGUI(PyObject* self, PyObject*) {
 	Player* p = PyEntity::asPlayer(self);
 	if (!p)
 		return nullptr;
-	p->sendCloseContainerPacket();
+	p->doDeleteContainerManager();
 	Py_RETURN_NONE;
 }
 
