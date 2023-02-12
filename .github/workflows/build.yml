@@ -2,9 +2,7 @@ name: Build
 
 on:
   push:
-    branches: [ main ]
   pull_request:
-    branches: [ main ]
 
   workflow_dispatch:
 
@@ -13,7 +11,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.1
@@ -27,11 +25,11 @@ jobs:
       - name: Organize dll and pdb files
         run: |
           mkdir ./x64/dllpdb
-          cp ./x64/Debug/BDSpyrunner.dll ./x64/dllpdb
-          cp ./x64/Debug/BDSpyrunner.pdb ./x64/dllpdb
+          cp ./x64/Debug/BDSpyrunnerW.dll ./x64/dllpdb
+          cp ./x64/Debug/BDSpyrunnerW.pdb ./x64/dllpdb
           
       - name: Upload build files
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: build
           path: ./x64/dllpdb

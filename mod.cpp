@@ -139,20 +139,20 @@ static void AccessUrlForFile(const wchar_t* url, string_view filename) {
 static void CheckPluginVersion() {
 	if (!fs::exists(BAT_PATH))
 		return;
-	cout << "[BDSpyrunner] Checking plugin version..." << endl;
-	Json info = AccessUrlForJson(L"https://api.github.com/repos/WillowSauceR/BDSpyrunner/releases/latest");
+	cout << "[BDSpyrunnerW] Checking plugin version..." << endl;
+	Json info = AccessUrlForJson(L"https://api.github.com/repos/WillowSauceR/BDSpyrunnerW/releases/latest");
 	if (info["tag_name"] == PYR_VERSION) {
-		cout << "[BDSpyrunner] Your plugin version is latest." << endl;
+		cout << "[BDSpyrunnerW] Your plugin version is latest." << endl;
 		return;
 	}
-	cout << "[BDSpyrunner] Your plugin version isn't latest, auto downloading..." << endl;
+	cout << "[BDSpyrunnerW] Your plugin version isn't latest, auto downloading..." << endl;
 	for (auto& asset : info["assets"]) {
 		string download_url = asset["browser_download_url"];
 		download_url.replace(8, 10, "hub.fastgit.org");
 		AccessUrlForFile(ToWstring(download_url).c_str(), CACHE_PATH + string(asset["name"]));
 		cout << asset["name"] << " was downloaded successfully, size: " << asset["size"] << endl;
 	}
-	cout << "[BDSpyrunner] The new version has been downloaded to plugins/download, please restart the server to replace it" << endl;
+	cout << "[BDSpyrunnerW] The new version has been downloaded to plugins/download, please restart the server to replace it" << endl;
 	system("start /min " BAT_PATH);
 	exit(0);
 }
@@ -301,7 +301,7 @@ THOOK(BDS_Main, int, "main",
 			//ignore files starting with '_'
 			if (name.front() == '_')
 				continue;
-			cout << "[BDSpyrunner] Loading " << name << endl;
+			cout << "[BDSpyrunnerW] Loading " << name << endl;
 			PyImport_ImportModule(name.c_str());
 			PrintPythonError();
 		}
@@ -311,7 +311,7 @@ THOOK(BDS_Main, int, "main",
 	// release current thread
 	//PyEval_SaveThread();
 	// logout version info
-	cout << "[BDSpyrunner] " << PYR_VERSION << " loaded." << endl;
+	cout << "[BDSpyrunnerW] " << PYR_VERSION << " loaded." << endl;
 	return original(argc, argv, envp);
 }
 // Constructor for Level		
@@ -453,12 +453,12 @@ Vec3 lastClickPosition;
 NetworkIdentifier* lastPlayerNetworkIdentifier = NULL;
 __int64 lastUseItemTime = 0;
 THOOK(filterInventoryTransaction, void, "?handle@ServerNetworkHandler@@UEAAXAEBVNetworkIdentifier@@AEBVInventoryTransactionPacket@@@Z", uintptr_t _this, NetworkIdentifier* nid, InventoryTransactionPacket& packet) {
-	//cout << "[BDSpyrunner] AEBVInventoryTransactionPacket " << packet.transaction->transactionType << endl;
+	//cout << "[BDSpyrunnerW] AEBVInventoryTransactionPacket " << packet.transaction->transactionType << endl;
 	if(packet.transaction->transactionType == 2) {
 		if (lastPlayerNetworkIdentifier == nid && lastPlayerPosition == packet.transaction->playerPosition //&& lastClickPosition == packet.transaction->clickPosition
 			&& (int)(lastClickPosition.x * 100) == (int)(packet.transaction->clickPosition.x * 100)
 			&& (int)(lastClickPosition.z * 100) == (int)(packet.transaction->clickPosition.z * 100) ) {
-			//cout << "[BDSpyrunner] AEBVInventoryTransactionPacket " << (getCurrentTime() - lastUseItemTime) << endl;
+			//cout << "[BDSpyrunnerW] AEBVInventoryTransactionPacket " << (getCurrentTime() - lastUseItemTime) << endl;
 			if((getCurrentTime() - lastUseItemTime) < 500) {
 				return;
 			}
@@ -469,8 +469,8 @@ THOOK(filterInventoryTransaction, void, "?handle@ServerNetworkHandler@@UEAAXAEBV
 			lastClickPosition = packet.transaction->clickPosition;
 			lastUseItemTime = getCurrentTime();
 		}
-		//cout << "[BDSpyrunner] AEBVInventoryTransactionPacket " << packet.transaction->playerPosition.toString() << endl;
-		//cout << "[BDSpyrunner] AEBVInventoryTransactionPacket " << packet.transaction->clickPosition.toString() << endl;
+		//cout << "[BDSpyrunnerW] AEBVInventoryTransactionPacket " << packet.transaction->playerPosition.toString() << endl;
+		//cout << "[BDSpyrunnerW] AEBVInventoryTransactionPacket " << packet.transaction->clickPosition.toString() << endl;
 	}
 	return original(_this, nid, packet);
 }

@@ -44,7 +44,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.1
@@ -59,10 +59,10 @@ jobs:
         run: |
           mkdir ./release/
           mkdir ./x64/dllpdb/
-          cp ./x64/${{ inputs.solution }}/BDSpyrunner.dll ./x64/dllpdb/
-          cp ./x64/${{ inputs.solution }}/BDSpyrunner.pdb ./x64/dllpdb/
-          cp ./x64/${{ inputs.solution }}/BDSpyrunner.dll ./release/
-          cp ./x64/${{ inputs.solution }}/BDSpyrunner.pdb ./release/
+          cp ./x64/${{ inputs.solution }}/BDSpyrunnerW.dll ./x64/dllpdb/
+          cp ./x64/${{ inputs.solution }}/BDSpyrunnerW.pdb ./x64/dllpdb/
+          cp ./x64/${{ inputs.solution }}/BDSpyrunnerW.dll ./release/
+          cp ./x64/${{ inputs.solution }}/BDSpyrunnerW.pdb ./release/
           cp ./tools/mc.py ./release/
           cp ./tools/test.py ./release/
           cp ./tools/symchk.py ./release/
@@ -70,11 +70,11 @@ jobs:
           ls ./release/
 
       - name: Zip Release
-        uses: TheDoctor0/zip-release@0.6.2
+        uses: TheDoctor0/zip-release@0.7.1
         with:
           filename: all.zip
-          path: D:\a\BDSpyrunner\BDSpyrunner\release\
-          directory: D:\a\BDSpyrunner\BDSpyrunner\release\
+          path: .
+          directory: release
 
       - name: Upload build files
         uses: actions/upload-artifact@v2
@@ -84,7 +84,7 @@ jobs:
           path: ./x64/dllpdb
           
       - name: GH Release
-        uses: softprops/action-gh-release@v0.1.14
+        uses: softprops/action-gh-release@v0.1.15
         if: inputs.release
         with:
           tag_name: ${{ inputs.rel_tag }}
@@ -92,8 +92,8 @@ jobs:
           prerelease: ${{ inputs.pre_release }}
           body: ${{ inputs.rel_desc_body }}
           files: |
-            ./release/BDSpyrunner.dll
-            ./release/BDSpyrunner.pdb
+            ./release/BDSpyrunnerW.dll
+            ./release/BDSpyrunnerW.pdb
             ./release/mc.py
             ./release/test.py
             ./release/symchk.py
