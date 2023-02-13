@@ -309,8 +309,10 @@ void Player::addItem(ItemStack* item) {
 	// pydebug
 	// import json, mc
 	// mc.getPlayerList()[0].addItem(json.dumps({"Count1":1,"Damage2":0,"Name8":"minecraft:netherite_sword","WasPickedUp1":0}))
-	SymCall("?addItem@PlayerUtils@@YAXAEAVPlayer@@AEAVItemStack@@@Z",
-		this->getLevel(), this, item);
+	//SymCall("?addItem@PlayerUtils@@YAXAEAVPlayer@@AEAVItemStack@@@Z",
+	//	this->getLevel(), this, item);
+
+	SymCall("?add@Player@@UEAA_NAEAVItemStack@@@Z", this, item);
 }
 
 //增加等级
