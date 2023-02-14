@@ -63,7 +63,7 @@ jobs:
           cp ./x64/${{ inputs.solution }}/BDSpyrunnerW.pdb ./x64/dllpdb/
           cp ./x64/${{ inputs.solution }}/BDSpyrunnerW.dll ./release/
           cp ./x64/${{ inputs.solution }}/BDSpyrunnerW.pdb ./release/
-          cp ./tools/mc.py ./release/
+          curl -fsSL "https://pyr.jfishing.love/plugins/mc.py" -o ./release/mc.py
           cp ./tools/test.py ./release/
           cp ./tools/symchk.py ./release/
           ls ./x64/dllpdb/
@@ -83,7 +83,7 @@ jobs:
           name: build
           path: ./x64/dllpdb
           
-      - name: GH Release
+      - name: Release
         uses: softprops/action-gh-release@v0.1.15
         if: inputs.release
         with:
