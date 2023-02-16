@@ -51,6 +51,9 @@
     <ClCompile Include="mc\DataIO.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="mod\Logger.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mc\Actor.h">
@@ -117,6 +120,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="MinecraftHeaders\Core\BinaryStream.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="mod\Logger.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

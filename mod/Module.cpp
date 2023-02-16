@@ -1,5 +1,6 @@
 #include "Module.h"
 #include "Version.h"
+#include "Logger.h"
 #include "../mc/tool.h"
 #include "../mc/Actor.h"
 #include "../mc/Block.h"
@@ -97,6 +98,35 @@ static PyObject* removeListener(PyObject*, PyObject* args) {
 	else {
 		Py_RETURN_ERROR("Listener not found");
 	}
+}
+// hot reload Python modules
+void ReloadPythonModules(string moduleName) {
+	Logger logger("BDSpyrunnerW");
+	if (moduleName.empty()) {
+		g_callback_functions.clear();
+		g_commands.clear();
+	}
+	for (auto& info : filesystem::directory_iterator("plugins\\py\\")) {
+		if (info.path().extension() == ".py") {
+			string name(info.path().stem().u8string());
+			if (name.front() == '_')
+				continue;
+			if (moduleName.empty() || moduleName == name) {
+				logger.info("Reloading " + name);
+				PyObject* pModule = PyImport_ReloadModule(PyImport_ImportModule(name.c_str()));
+				if (pModule == NULL) {
+					PrintPythonError();
+				}
+			}
+		}
+	}
+}
+//Reload Plugin
+static PyObject* reload(PyObject*, PyObject* args) {
+	const char* name = "";
+	Py_PARSE("s", &name);
+	ReloadPythonModules(name);
+	Py_RETURN_NONE;
 }
 //设置指令说明
 static PyObject* setCommandDescription(PyObject*, PyObject* args) {
@@ -377,6 +407,7 @@ static PyMethodDef Methods[]{
 	{ "runcmd", runCommand, METH_VARARGS, nullptr },
 	{ "setListener", setListener, METH_VARARGS, nullptr },
 	{ "removeListener", removeListener, METH_VARARGS, nullptr },
+	{ "reload", reload, METH_VARARGS, nullptr },
 	{ "setCommandDescription", setCommandDescription, METH_VARARGS, nullptr },
 	{ "getPlayerByXuid", getPlayerByXuid, METH_VARARGS, nullptr },
 	{ "getPlayerList", getPlayerList, METH_NOARGS, nullptr },

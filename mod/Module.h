@@ -14,3 +14,5 @@ inline static float g_damage = 0;
 extern "C" PyObject * mc_init();
 
 __int64 getCurrentTime();
+
+void ReloadPythonModules(std::string moduleName);

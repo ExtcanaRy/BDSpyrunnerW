@@ -14,14 +14,17 @@
 #include "mod/Entity.h"
 #include "mod/Event.h"
 #include "mod/Module.h"
+#include "mod/Logger.h"
 #include "mod/Version.h"
 #include "mc/InventoryTransaction.h"
 
 #define PLUGIN_PATH "plugins\\py\\"
 
 using namespace std;
-
 namespace fs = filesystem;
+
+Logger logger("BDSpyrunnerW");
+
 #pragma region Function
 #if 0
 //Dll entry func
@@ -301,7 +304,7 @@ THOOK(BDS_Main, int, "main",
 			//ignore files starting with '_'
 			if (name.front() == '_')
 				continue;
-			cout << "[BDSpyrunnerW] Loading " << name << endl;
+			logger.info("Loading " + name);
 			PyImport_ImportModule(name.c_str());
 			PrintPythonError();
 		}
@@ -311,7 +314,7 @@ THOOK(BDS_Main, int, "main",
 	// release current thread
 	//PyEval_SaveThread();
 	// logout version info
-	cout << "[BDSpyrunnerW] " << PYR_VERSION << " loaded." << endl;
+	logger.info(PYR_VERSION + string(" loaded."));
 	return original(argc, argv, envp);
 }
 // Constructor for Level		
@@ -394,18 +397,44 @@ THOOK(onConsoleOutput, ostream&, "??$_Insert_string@DU?$char_traits@D@std@@_K@st
 	}
 	return original(_this, str, size);
 }
+// Parse command args
+std::vector<std::string> parseCmdArgv(const std::string& cmd) {
+	std::vector<std::string> cmdArgs;
+	std::string arg;
+	for (const char& c : cmd) {
+		if (c == ' ') {
+			cmdArgs.push_back(arg);
+			arg.clear();
+		}
+		else {
+			arg += c;
+		}
+	}
+	cmdArgs.push_back(arg);
+	return cmdArgs;
+}
 // Console input, which is actually the bottom of the command queue
 THOOK(onConsoleInput, bool, "??$inner_enqueue@$0A@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@?$SPSCQueue@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@$0CAA@@@AEAA_NAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z",
 	SPSCQueue* _this, string* cmd) {
 	EventCallBackHelper h(EventCode::onConsoleInput);
 	static bool debug = false;
-	if (*cmd == "pydebug") {
+	auto argv = parseCmdArgv(*cmd);
+	if (argv[0] == "pydebug") {
 		if (debug) {
 			debug = false;
 		}
 		else {
 			debug = true;
 			cout << ">>> ";
+		}
+		return false;
+	}
+	else if (argv[0] == "pyreload") {
+		if (argv.size() == 1) {
+			ReloadPythonModules("");
+		}
+		else if (argv.size() == 2) {
+			ReloadPythonModules(argv[1]);
 		}
 		return false;
 	}
@@ -453,7 +482,7 @@ Vec3 lastClickPosition;
 NetworkIdentifier* lastPlayerNetworkIdentifier = NULL;
 __int64 lastUseItemTime = 0;
 THOOK(filterInventoryTransaction, void, "?handle@ServerNetworkHandler@@UEAAXAEBVNetworkIdentifier@@AEBVInventoryTransactionPacket@@@Z", uintptr_t _this, NetworkIdentifier* nid, InventoryTransactionPacket& packet) {
-	//cout << "[BDSpyrunnerW] AEBVInventoryTransactionPacket " << packet.transaction->transactionType << endl;
+	//logger.debug(string("AEBVInventoryTransactionPacket ") + packet.transaction->transactionType);
 	if(packet.transaction->transactionType == 2) {
 		if (lastPlayerNetworkIdentifier == nid && lastPlayerPosition == packet.transaction->playerPosition //&& lastClickPosition == packet.transaction->clickPosition
 			&& (int)(lastClickPosition.x * 100) == (int)(packet.transaction->clickPosition.x * 100)
