@@ -47,26 +47,30 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v1.1
+        uses: microsoft/setup-msbuild@v1
         with:
           msbuild-architecture: x64
-      
+            
       - name: Build Project
         working-directory: ${{env.GITHUB_WORKSPACE}}
-        run: msbuild /m /p:Configuration=${{ inputs.solution }} ./
-            
+        run: |
+          mkdir build
+          cd build
+          cmake ..
+          cmake --build . --config ${{ inputs.solution }} -j
+
       - name: Organize dll and pdb files
         run: |
           mkdir ./release/
-          mkdir ./x64/dllpdb/
-          cp ./x64/${{ inputs.solution }}/BDSpyrunnerW.dll ./x64/dllpdb/
-          cp ./x64/${{ inputs.solution }}/BDSpyrunnerW.pdb ./x64/dllpdb/
-          cp ./x64/${{ inputs.solution }}/BDSpyrunnerW.dll ./release/
-          cp ./x64/${{ inputs.solution }}/BDSpyrunnerW.pdb ./release/
+          mkdir ./build/dllpdb/
+          cp ./build/${{ inputs.solution }}/BDSpyrunnerW.dll ./build/dllpdb/
+          cp ./build/${{ inputs.solution }}/BDSpyrunnerW.pdb ./build/dllpdb/
+          cp ./build/${{ inputs.solution }}/BDSpyrunnerW.dll ./release/
+          cp ./build/${{ inputs.solution }}/BDSpyrunnerW.pdb ./release/
           curl -fsSL "https://pyr.jfishing.love/plugins/mc.py" -o ./release/mc.py
           cp ./tools/test.py ./release/
           cp ./tools/symchk.py ./release/
-          ls ./x64/dllpdb/
+          ls ./build/dllpdb/
           ls ./release/
 
       - name: Zip Release
@@ -81,7 +85,7 @@ jobs:
         if: inputs.artifact
         with:
           name: build
-          path: ./x64/dllpdb
+          path: ./build/dllpdb
           
       - name: Release
         uses: softprops/action-gh-release@v0.1.15

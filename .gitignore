@@ -1,6 +1,6 @@
 .vs/
 .vscode/
-x64/
+build/
 *.user
 tools/symbols.txt
 tools/cvdump.exe
