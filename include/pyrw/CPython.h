@@ -1,5 +1,5 @@
 #pragma once
-#pragma comment(lib, "../../lib/python37.lib")
+#pragma comment(lib, "python37.lib")
 #define PY_SSIZE_T_CLEAN
 #include <CPython/Python.h>
 

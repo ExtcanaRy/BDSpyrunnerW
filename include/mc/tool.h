@@ -1,7 +1,7 @@
 #pragma once
 #pragma execution_character_set("utf-8")
 #pragma warning(disable:4996)
-#pragma comment(lib, "../../lib/LiteLoader.lib")
+#pragma comment(lib, "LiteLoader.lib")
 #include <iostream>
 #include "Level.h"
 #include "NetWork.h"
