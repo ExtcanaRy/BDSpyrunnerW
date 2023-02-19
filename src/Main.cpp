@@ -20,8 +20,6 @@
 #include <pyrw/Logger.h>
 #include <pyrw/Version.h>
 
-#define PLUGIN_PATH "plugins\\py\\"
-
 using namespace std;
 namespace fs = filesystem;
 
@@ -271,14 +269,6 @@ THOOK(BDS_Main, int, "main",
 		delete t;
 	}
 #endif
-	if (!fs::exists(PLUGIN_PATH))
-		fs::create_directories(PLUGIN_PATH);
-	wstring py_path(PLUGIN_PATH L";"
-					PLUGIN_PATH "Dlls;"
-					PLUGIN_PATH "Lib;"
-					PLUGIN_PATH "Extra;");
-	py_path.append(Py_GetPath());
-	Py_SetPath(py_path.c_str());
 #if 0
 	// Pre-init 3.8+
 	PyPreConfig cfg;
@@ -287,34 +277,7 @@ THOOK(BDS_Main, int, "main",
 	cfg.configure_locale = 0;
 	Py_PreInitialize(&cfg);
 #endif
-	// Add a module
-	if((fopen("plugins/py/mc.py", "r")) == NULL)
-		PyImport_AppendInittab("mc", mc_init);
-	else
-		PyImport_AppendInittab("mco", mc_init);
-	// init interpreter
-	Py_InitializeEx(0);
-	// init types
-	if (PyType_Ready(&PyEntity_Type) < 0)
-		Py_FatalError("Can't initialize entity type");
-	// enable thread support
-	PyEval_InitThreads();
-	for (auto& info : fs::directory_iterator(PLUGIN_PATH)) {
-		//whether the file is py
-		if (info.path().extension() == ".py") {
-			string name(info.path().stem().u8string());
-			//ignore files starting with '_'
-			if (name.front() == '_')
-				continue;
-			logger.info("Loading " + name);
-			PyImport_ImportModule(name.c_str());
-			PrintPythonError();
-		}
-	}
-	// Executed before starting the child thread, in order to release the global lock obtained by PyEval_InitThreads, which may not be available to the child thread otherwise.
-	PyEval_ReleaseThread(PyThreadState_Get());
-	// release current thread
-	//PyEval_SaveThread();
+	InitPythonInterpreter(false);
 	// logout version info
 	logger.info(PYR_VERSION + string(" loaded."));
 	return original(argc, argv, envp);
@@ -421,7 +384,9 @@ THOOK(onConsoleInput, bool, "??$inner_enqueue@$0A@AEBV?$basic_string@DU?$char_tr
 	EventCallBackHelper h(EventCode::onConsoleInput);
 	static bool debug = false;
 	auto argv = parseCmdArgv(*cmd);
-	if (argv[0] == "pydebug") {
+	if (argv[0] == "stop"){
+		return original(_this, cmd);
+	} else if (argv[0] == "pydebug") {
 		if (debug) {
 			debug = false;
 		}
@@ -430,14 +395,17 @@ THOOK(onConsoleInput, bool, "??$inner_enqueue@$0A@AEBV?$basic_string@DU?$char_tr
 			cout << ">>> ";
 		}
 		return false;
-	}
-	else if (argv[0] == "pyreload") {
+	} else if (argv[0] == "pyreload") {
 		if (argv.size() == 1) {
 			ReloadPythonModules("");
 		}
 		else if (argv.size() == 2) {
 			ReloadPythonModules(argv[1]);
 		}
+		return false;
+	} else if (argv[0] == "pyreinit") {
+		//Does not work fully and can cause crash
+		InitPythonInterpreter(true);
 		return false;
 	}
 	if (debug) {

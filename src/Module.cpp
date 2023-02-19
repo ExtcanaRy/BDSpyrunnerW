@@ -102,25 +102,89 @@ static PyObject* removeListener(PyObject*, PyObject* args) {
 }
 // hot reload Python modules
 void ReloadPythonModules(string moduleName) {
-	Logger logger("BDSpyrunnerW");
-	if (moduleName.empty()) {
-		g_callback_functions.clear();
-		g_commands.clear();
-	}
-	for (auto& info : filesystem::directory_iterator("plugins\\py\\")) {
-		if (info.path().extension() == ".py") {
-			string name(info.path().stem().u8string());
-			if (name.front() == '_')
-				continue;
-			if (moduleName.empty() || moduleName == name) {
-				logger.info("Reloading " + name);
-				PyObject* pModule = PyImport_ReloadModule(PyImport_ImportModule(name.c_str()));
-				if (pModule == NULL) {
-					PrintPythonError();
-				}
+    Logger logger("BDSpyrunnerW");
+    if (moduleName.empty()) {
+        g_callback_functions.clear();
+        g_commands.clear();
+    }
+    for (auto& [name, pModule] : g_py_modules) {
+        if (moduleName.empty() || moduleName == name) {
+            logger.info("Reloading " + name);
+            PyObject* pNewModule = PyImport_ReloadModule(pModule);
+            if (pNewModule == NULL) {
+                PrintPythonError();
+            } else {
+				g_py_modules[name] = pNewModule;
 			}
+        }
+    }
+}
+void LoadPythonModules(string moduleName) {
+    Logger logger("BDSpyrunnerW");
+    for (auto& info : filesystem::directory_iterator(PLUGIN_PATH)) {
+        //whether the file is py
+        if (info.path().extension() == ".py") {
+            string name(info.path().stem().u8string());
+            //ignore files starting with '_'
+            if (name.front() == '_')
+                continue;
+            if (g_py_modules.find(name) != g_py_modules.end()) {
+                logger.info(name + " already loaded, reloading...");
+				ReloadPythonModules(name);
+                continue;
+            }
+            // check if this is the module we want to load
+            if (!moduleName.empty() && name != moduleName) {
+                continue;
+            }
+            logger.info("Loading " + name);
+            PyObject* pModule = PyImport_ImportModule(name.c_str());
+            if (pModule == NULL) {
+                PrintPythonError();
+            } else {
+                g_py_modules[name] = pModule;
+            }
+        }
+    }
+}
+
+void InitPythonInterpreter(bool reinit) {
+    // shutdown interpreter & release resources
+	if (reinit) {
+		for (auto& [name, pModule] : g_py_modules) {
+			Py_DECREF(pModule);
 		}
+		g_py_modules.clear();
+		Py_FinalizeEx();
 	}
+    // init interpreter
+	if (!filesystem::exists(PLUGIN_PATH))
+		filesystem::create_directories(PLUGIN_PATH);
+	wstring py_path(PLUGIN_PATH L";"
+					PLUGIN_PATH "Dlls;"
+					PLUGIN_PATH "Lib;"
+					PLUGIN_PATH "Extra;");
+	py_path.append(Py_GetPath());
+	Py_SetPath(py_path.c_str());
+	// Add a module
+	if((fopen((string(PLUGIN_PATH) + "mc.py").c_str(), "r")) == NULL)
+		PyImport_AppendInittab("mc", mc_init);
+	else
+		PyImport_AppendInittab("mco", mc_init);
+    Py_InitializeEx(0);
+    if (PyType_Ready(&PyEntity_Type) < 0) {
+        Py_FatalError("Can't initialize entity type");
+    }
+    PyEval_InitThreads();
+    // load modules
+	LoadPythonModules("");
+	// Executed before starting the child thread,
+	// in order to release the global lock obtained by PyEval_InitThreads, 
+	// which may not be available to the child thread otherwise.
+	if (!reinit)
+		PyEval_ReleaseThread(PyThreadState_Get());
+	// release current thread
+	//PyEval_SaveThread();
 }
 //Reload Plugin
 static PyObject* reload(PyObject*, PyObject* args) {
