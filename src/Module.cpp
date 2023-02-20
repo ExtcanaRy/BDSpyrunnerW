@@ -13,21 +13,136 @@
 
 using namespace std;
 
-constexpr int IsSlimeChunk(unsigned x, unsigned z) {
-	unsigned mt0 = (x * 0x1F1F1F1F) ^ z;
-	unsigned mt1 = (1812433253u * (mt0 ^ (mt0 >> 30u)) + 1);
-	unsigned mt2 = mt1;
-	for (unsigned i = 2; i < 398; ++i)
-		mt2 = (1812433253u * (mt2 ^ (mt2 >> 30u)) + i);
-	unsigned k = (mt0 & 0x80000000u) + (mt1 & 0x7FFFFFFFU);
-	mt0 = mt2 ^ (k >> 1u);
-	if (k & 1)
-		mt0 ^= 2567483615u;
-	mt0 ^= (mt0 >> 11u);
-	mt0 ^= (mt0 << 7u) & 0x9D2C5680u;
-	mt0 ^= (mt0 << 15u) & 0xEFC60000u;
-	mt0 ^= (mt0 >> 18u);
-	return !(mt0 % 10);
+// hot reload Python modules
+void ReloadPythonModules(string moduleName) {
+	Logger logger("BDSpyrunnerW");
+	if (moduleName.empty()) {
+		g_callback_functions.clear();
+		g_commands.clear();
+	}
+	for (auto& [name, pModule] : g_py_modules) {
+		if (moduleName.empty() || moduleName == name) {
+			logger.info("Reloading " + name);
+			PyObject* pNewModule = PyImport_ReloadModule(pModule);
+			if (pNewModule == NULL) {
+				PrintPythonError();
+			}
+			else {
+				g_py_modules[name] = pNewModule;
+			}
+		}
+	}
+}
+
+void LoadPythonModules(string moduleName) {
+	Logger logger("BDSpyrunnerW");
+	for (auto& info : filesystem::directory_iterator(PLUGIN_PATH)) {
+		//whether the file is py
+		if (info.path().extension() == ".py") {
+			string name(info.path().stem().u8string());
+			//ignore files starting with '_'
+			if (name.front() == '_')
+				continue;
+			if (g_py_modules.find(name) != g_py_modules.end()) {
+				logger.info(name + " already loaded, reloading...");
+				ReloadPythonModules(name);
+				continue;
+			}
+			// check if this is the module we want to load
+			if (!moduleName.empty() && name != moduleName) {
+				continue;
+			}
+			logger.info("Loading " + name);
+			PyObject* pModule = PyImport_ImportModule(name.c_str());
+			if (pModule == NULL) {
+				PrintPythonError();
+			}
+			else {
+				g_py_modules[name] = pModule;
+			}
+		}
+	}
+}
+
+void InitPythonInterpreter(bool reinit) {
+	// shutdown interpreter & release resources
+	if (reinit) {
+		for (auto& [name, pModule] : g_py_modules) {
+			Py_DECREF(pModule);
+		}
+		g_py_modules.clear();
+		Py_FinalizeEx();
+	}
+	// init interpreter
+	if (!filesystem::exists(PLUGIN_PATH))
+		filesystem::create_directories(PLUGIN_PATH);
+	wstring py_path(PLUGIN_PATH L";"
+					PLUGIN_PATH "Dlls;"
+					PLUGIN_PATH "Lib;"
+					PLUGIN_PATH "Extra;");
+	py_path.append(Py_GetPath());
+	Py_SetPath(py_path.c_str());
+	// Add a module
+	if ((fopen((string(PLUGIN_PATH) + "mc.py").c_str(), "r")) == NULL)
+		PyImport_AppendInittab("mc", mc_init);
+	else
+		PyImport_AppendInittab("mco", mc_init);
+	Py_InitializeEx(0);
+	if (PyType_Ready(&PyEntity_Type) < 0) {
+		Py_FatalError("Can't initialize entity type");
+	}
+	PyEval_InitThreads();
+	// load modules
+	LoadPythonModules("");
+	// Executed before starting the child thread,
+	// in order to release the global lock obtained by PyEval_InitThreads, 
+	// which may not be available to the child thread otherwise.
+	if (!reinit)
+		PyEval_ReleaseThread(PyThreadState_Get());
+	// release current thread
+	//PyEval_SaveThread();
+}
+//Reload Plugin
+static PyObject* reload(PyObject*, PyObject* args) {
+	const char* name = "";
+	Py_PARSE("s", &name);
+	ReloadPythonModules(name);
+	Py_RETURN_NONE;
+}
+
+static PyObject* setListener(PyObject*, PyObject* args) {
+	const char* name = ""; PyObject* func;
+	Py_PARSE("sO", &name, &func);
+	auto it = events.find(name);
+	if (!PyFunction_Check(func))
+		Py_RETURN_ERROR("Parameter 2 is not callable");
+	if (it == events.end()) {
+		char err_msg[0x30] = "Invalid Listener key words: ";
+		strcat(err_msg, name);
+		Py_RETURN_ERROR(err_msg);
+	}
+	g_callback_functions[it->second].push_back(func);
+	Py_RETURN_NONE;
+}
+
+static PyObject* removeListener(PyObject*, PyObject* args) {
+	const char* name = ""; PyObject* func;
+	Py_PARSE("sO", &name, &func);
+	auto it = events.find(name);
+	if (!PyFunction_Check(func))
+		Py_RETURN_ERROR("Parameter 2 is not callable");
+	if (it == events.end())
+		Py_RETURN_ERROR("Invalid Listener key words");
+
+	auto& callbacks = g_callback_functions[it->second];
+	auto iter = std::find(callbacks.begin(), callbacks.end(), func);
+	if (iter != callbacks.end()) {
+		callbacks.erase(iter);
+		Py_RETURN_NONE;
+	}
+	else {
+		Py_RETURN_ERROR("Listener not found");
+	}
 }
 
 static PyObject* minVersionRequire(PyObject*, PyObject* args) {
@@ -56,6 +171,23 @@ static PyObject* logout(PyObject*, PyObject* args) {
 	Py_RETURN_NONE;
 }
 
+constexpr int IsSlimeChunk(unsigned x, unsigned z) {
+	unsigned mt0 = (x * 0x1F1F1F1F) ^ z;
+	unsigned mt1 = (1812433253u * (mt0 ^ (mt0 >> 30u)) + 1);
+	unsigned mt2 = mt1;
+	for (unsigned i = 2; i < 398; ++i)
+		mt2 = (1812433253u * (mt2 ^ (mt2 >> 30u)) + i);
+	unsigned k = (mt0 & 0x80000000u) + (mt1 & 0x7FFFFFFFU);
+	mt0 = mt2 ^ (k >> 1u);
+	if (k & 1)
+		mt0 ^= 2567483615u;
+	mt0 ^= (mt0 >> 11u);
+	mt0 ^= (mt0 << 7u) & 0x9D2C5680u;
+	mt0 ^= (mt0 << 15u) & 0xEFC60000u;
+	mt0 ^= (mt0 >> 18u);
+	return !(mt0 % 10);
+}
+
 static PyObject* runCommand(PyObject*, PyObject* args) {
 	const char* cmd = "";
 	Py_PARSE("s", &cmd);
@@ -63,134 +195,6 @@ static PyObject* runCommand(PyObject*, PyObject* args) {
 		Py_RETURN_ERROR("Command queue is not initialized");
 	SymCall<bool, SPSCQueue*, const string&>("??$inner_enqueue@$0A@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@?$SPSCQueue@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@$0CAA@@@AEAA_NAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z",
 		global<SPSCQueue>, cmd);
-	Py_RETURN_NONE;
-}
-
-static PyObject* setListener(PyObject*, PyObject* args) {
-	const char* name = ""; PyObject* func;
-	Py_PARSE("sO", &name, &func);
-	auto it = events.find(name);
-	if (!PyFunction_Check(func))
-		Py_RETURN_ERROR("Parameter 2 is not callable");
-	if (it == events.end()) {
-		char err_msg[0x30] = "Invalid Listener key words: ";
-		strcat(err_msg, name);
-		Py_RETURN_ERROR(err_msg);
-	}
-	g_callback_functions[it->second].push_back(func);
-	Py_RETURN_NONE;
-}
-
-static PyObject* removeListener(PyObject*, PyObject* args) {
-	const char* name = ""; PyObject* func;
-	Py_PARSE("sO", &name, &func);
-	auto it = events.find(name);
-	if (!PyFunction_Check(func))
-		Py_RETURN_ERROR("Parameter 2 is not callable");
-	if (it == events.end())
-		Py_RETURN_ERROR("Invalid Listener key words");
-	
-	auto& callbacks = g_callback_functions[it->second];
-	auto iter = std::find(callbacks.begin(), callbacks.end(), func);
-	if (iter != callbacks.end()) {
-		callbacks.erase(iter);
-		Py_RETURN_NONE;
-	}
-	else {
-		Py_RETURN_ERROR("Listener not found");
-	}
-}
-// hot reload Python modules
-void ReloadPythonModules(string moduleName) {
-    Logger logger("BDSpyrunnerW");
-    if (moduleName.empty()) {
-        g_callback_functions.clear();
-        g_commands.clear();
-    }
-    for (auto& [name, pModule] : g_py_modules) {
-        if (moduleName.empty() || moduleName == name) {
-            logger.info("Reloading " + name);
-            PyObject* pNewModule = PyImport_ReloadModule(pModule);
-            if (pNewModule == NULL) {
-                PrintPythonError();
-            } else {
-				g_py_modules[name] = pNewModule;
-			}
-        }
-    }
-}
-void LoadPythonModules(string moduleName) {
-    Logger logger("BDSpyrunnerW");
-    for (auto& info : filesystem::directory_iterator(PLUGIN_PATH)) {
-        //whether the file is py
-        if (info.path().extension() == ".py") {
-            string name(info.path().stem().u8string());
-            //ignore files starting with '_'
-            if (name.front() == '_')
-                continue;
-            if (g_py_modules.find(name) != g_py_modules.end()) {
-                logger.info(name + " already loaded, reloading...");
-				ReloadPythonModules(name);
-                continue;
-            }
-            // check if this is the module we want to load
-            if (!moduleName.empty() && name != moduleName) {
-                continue;
-            }
-            logger.info("Loading " + name);
-            PyObject* pModule = PyImport_ImportModule(name.c_str());
-            if (pModule == NULL) {
-                PrintPythonError();
-            } else {
-                g_py_modules[name] = pModule;
-            }
-        }
-    }
-}
-
-void InitPythonInterpreter(bool reinit) {
-    // shutdown interpreter & release resources
-	if (reinit) {
-		for (auto& [name, pModule] : g_py_modules) {
-			Py_DECREF(pModule);
-		}
-		g_py_modules.clear();
-		Py_FinalizeEx();
-	}
-    // init interpreter
-	if (!filesystem::exists(PLUGIN_PATH))
-		filesystem::create_directories(PLUGIN_PATH);
-	wstring py_path(PLUGIN_PATH L";"
-					PLUGIN_PATH "Dlls;"
-					PLUGIN_PATH "Lib;"
-					PLUGIN_PATH "Extra;");
-	py_path.append(Py_GetPath());
-	Py_SetPath(py_path.c_str());
-	// Add a module
-	if((fopen((string(PLUGIN_PATH) + "mc.py").c_str(), "r")) == NULL)
-		PyImport_AppendInittab("mc", mc_init);
-	else
-		PyImport_AppendInittab("mco", mc_init);
-    Py_InitializeEx(0);
-    if (PyType_Ready(&PyEntity_Type) < 0) {
-        Py_FatalError("Can't initialize entity type");
-    }
-    PyEval_InitThreads();
-    // load modules
-	LoadPythonModules("");
-	// Executed before starting the child thread,
-	// in order to release the global lock obtained by PyEval_InitThreads, 
-	// which may not be available to the child thread otherwise.
-	if (!reinit)
-		PyEval_ReleaseThread(PyThreadState_Get());
-	// release current thread
-	//PyEval_SaveThread();
-}
-//Reload Plugin
-static PyObject* reload(PyObject*, PyObject* args) {
-	const char* name = "";
-	Py_PARSE("s", &name);
-	ReloadPythonModules(name);
 	Py_RETURN_NONE;
 }
 
@@ -214,11 +218,11 @@ static PyObject* getPlayerByXuid(PyObject*, PyObject* args) {
 
 static PyObject* getPlayerList(PyObject*, PyObject* args) {
 	PyObject* list = PyList_New(0);
-	if(global<std::vector<Player*, std::allocator<Player*>>> != nullptr)
+	if (global<std::vector<Player*, std::allocator<Player*>>> != nullptr)
 		for (std::vector<Player*>::iterator iter = global<std::vector<Player*>>->begin();
 			iter != global<std::vector<Player*>>->end(); iter++) {
-			PyList_Append(list, ToEntity(*iter));
-		}
+		PyList_Append(list, ToEntity(*iter));
+	}
 	return list;
 }
 
@@ -493,14 +497,14 @@ static PyMethodDef Methods[]{
 
 static PyModuleDef Module{
 	PyModuleDef_HEAD_INIT,
-	"mc",
-	"API functions",
-	-1,
-	Methods,
-	nullptr,
-	nullptr,
-	nullptr,
-	nullptr
+		"mc",
+		"API functions",
+		-1,
+		Methods,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr
 };
 
 extern "C" PyObject * mc_init() {

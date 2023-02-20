@@ -26,140 +26,6 @@ namespace fs = filesystem;
 Logger logger("BDSpyrunnerW");
 
 #pragma region Function
-#if 0
-//Dll entry func
-BOOL WINAPI DllMain(
-	HINSTANCE hinstDLL	/* handle to DLL module */,
-	DWORD fdwReason		/* reason for calling function */,
-	LPVOID lpReserved	/* reserved */
-) {
-	// Perform actions based on the reason for calling.
-	switch (fdwReason) {
-	case DLL_PROCESS_ATTACH:
-		// Initialize once for each new process.
-		// Return FALSE to fail DLL load.
-		break;
-	case DLL_THREAD_ATTACH:
-		// Do thread-specific initialization.
-		break;
-	case DLL_THREAD_DETACH:
-		// Do thread-specific cleanup.
-		break;
-	case DLL_PROCESS_DETACH:
-		// Perform any necessary cleanup.
-		break;
-	}
-	return TRUE;  // Successful DLL_PROCESS_ATTACH.
-}
-//GBK to UTF8
-static string GbkToUtf8(const char* src_str) {
-	int len = MultiByteToWideChar(CP_ACP, 0, src_str, -1, NULL, 0);
-	wchar_t* wstr = new wchar_t[len + 1];
-	memset(wstr, 0, len + 1);
-	MultiByteToWideChar(CP_ACP, 0, src_str, -1, wstr, len);
-	len = WideCharToMultiByte(CP_UTF8, 0, wstr, -1, NULL, 0, NULL, NULL);
-	char* str = new char[len + 1];
-	memset(str, 0, len + 1);
-	WideCharToMultiByte(CP_UTF8, 0, wstr, -1, str, len, NULL, NULL);
-	string strTemp = str;
-	if (wstr) delete[] wstr;
-	if (str) delete[] str;
-	return strTemp;
-}
-//UTF8 to GBK
-static string Utf8ToGbk(const char* src_str) {
-	int len = MultiByteToWideChar(CP_UTF8, 0, src_str, -1, NULL, 0);
-	wchar_t* wszGBK = new wchar_t[len + 1];
-	memset(wszGBK, 0, len * 2 + 2);
-	MultiByteToWideChar(CP_UTF8, 0, src_str, -1, wszGBK, len);
-	len = WideCharToMultiByte(CP_ACP, 0, wszGBK, -1, NULL, 0, NULL, NULL);
-	char* szGBK = new char[len + 1];
-	memset(szGBK, 0, len + 1);
-	WideCharToMultiByte(CP_ACP, 0, wszGBK, -1, szGBK, len, NULL, NULL);
-	string strTemp(szGBK);
-	if (wszGBK) delete[] wszGBK;
-	if (szGBK) delete[] szGBK;
-	return strTemp;
-}
-//to wide string
-static wstring ToWstring(string_view s) {
-	string curlLocale = setlocale(LC_ALL, NULL);
-	setlocale(LC_ALL, "chs");
-	const char* _Source = s.data();
-	size_t _Dsize = s.size() + 1;
-
-	wchar_t* _Dest = new wchar_t[_Dsize];
-	size_t i;
-	mbstowcs_s(&i, _Dest, _Dsize, _Source, s.size());
-	wstring result = _Dest;
-	delete[] _Dest;
-	setlocale(LC_ALL, curlLocale.c_str());
-	return result;
-}
-//access url
-static Json AccessUrlForJson(const wchar_t* url) {
-	string data;
-	char buffer[BLOCK_SIZE];
-
-	HINTERNET hSession = InternetOpen(USER_AGENT, INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
-	if (!hSession)
-		return nullptr;
-	HINTERNET handle2 = InternetOpenUrl(hSession, url, NULL, 0, INTERNET_FLAG_DONT_CACHE, 0);
-	if (!handle2)
-		return nullptr;
-	DWORD size = 0;
-	do {
-		InternetReadFile(handle2, buffer, BLOCK_SIZE, &size);
-		data.append(buffer, size);
-	} while (size);
-	InternetCloseHandle(handle2);
-	InternetCloseHandle(hSession);
-	return StringToJson(data);
-}
-//access url
-static void AccessUrlForFile(const wchar_t* url, string_view filename) {
-	char buffer[BLOCK_SIZE];
-
-	HINTERNET hSession = InternetOpen(USER_AGENT, INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
-	if (!hSession)
-		return;
-	HINTERNET handle2 = InternetOpenUrl(hSession, url, NULL, 0, INTERNET_FLAG_DONT_CACHE, 0);
-	if (!handle2)
-		return;
-	DWORD total = 0;
-	DWORD size = 0;
-	ofstream file(filename.data(), ios::out | ios::binary);
-	do {
-		total += size;
-		cout << "Downloading " << filename << "... " << total << "bytes\r";
-		InternetReadFile(handle2, buffer, BLOCK_SIZE, &size);
-		file.write(buffer, size);
-	} while (size);
-	InternetCloseHandle(handle2);
-	InternetCloseHandle(hSession);
-}
-// check version
-static void CheckPluginVersion() {
-	if (!fs::exists(BAT_PATH))
-		return;
-	cout << "[BDSpyrunnerW] Checking plugin version..." << endl;
-	Json info = AccessUrlForJson(L"https://api.github.com/repos/WillowSauceR/BDSpyrunnerW/releases/latest");
-	if (info["tag_name"] == PYR_VERSION) {
-		cout << "[BDSpyrunnerW] Your plugin version is latest." << endl;
-		return;
-	}
-	cout << "[BDSpyrunnerW] Your plugin version isn't latest, auto downloading..." << endl;
-	for (auto& asset : info["assets"]) {
-		string download_url = asset["browser_download_url"];
-		download_url.replace(8, 10, "hub.fastgit.org");
-		AccessUrlForFile(ToWstring(download_url).c_str(), CACHE_PATH + string(asset["name"]));
-		cout << asset["name"] << " was downloaded successfully, size: " << asset["size"] << endl;
-	}
-	cout << "[BDSpyrunnerW] The new version has been downloaded to plugins/download, please restart the server to replace it" << endl;
-	system("start /min " BAT_PATH);
-	exit(0);
-}
-#endif 
 // request GIL on create
 class EventCallBackHelper {
 public:
@@ -447,17 +313,18 @@ THOOK(onPlayerLeft, void, "?_onPlayerLeft@ServerNetworkHandler@@AEAAXPEAVServerP
 	return original(_this, p, v3);
 }
 
+// Fix multiple right clicks on Win10 client
 Vec3 lastPlayerPosition;
 Vec3 lastClickPosition;
 NetworkIdentifier* lastPlayerNetworkIdentifier = NULL;
 __int64 lastUseItemTime = 0;
 THOOK(filterInventoryTransaction, void, "?handle@ServerNetworkHandler@@UEAAXAEBVNetworkIdentifier@@AEBVInventoryTransactionPacket@@@Z", uintptr_t _this, NetworkIdentifier* nid, InventoryTransactionPacket& packet) {
-	//logger.debug(string("AEBVInventoryTransactionPacket ") + packet.transaction->transactionType);
+	// logger.debug(to_string(packet.transaction->transactionType), "AEBVInventoryTransactionPacket");
 	if(packet.transaction->transactionType == 2) {
 		if (lastPlayerNetworkIdentifier == nid && lastPlayerPosition == packet.transaction->playerPosition //&& lastClickPosition == packet.transaction->clickPosition
 			&& (int)(lastClickPosition.x * 100) == (int)(packet.transaction->clickPosition.x * 100)
 			&& (int)(lastClickPosition.z * 100) == (int)(packet.transaction->clickPosition.z * 100) ) {
-			//cout << "[BDSpyrunnerW] AEBVInventoryTransactionPacket " << (getCurrentTime() - lastUseItemTime) << endl;
+			// logger.debug(to_string(getCurrentTime() - lastUseItemTime), "AEBVInventoryTransactionPacket");
 			if((getCurrentTime() - lastUseItemTime) < 500) {
 				return;
 			}
@@ -468,8 +335,8 @@ THOOK(filterInventoryTransaction, void, "?handle@ServerNetworkHandler@@UEAAXAEBV
 			lastClickPosition = packet.transaction->clickPosition;
 			lastUseItemTime = getCurrentTime();
 		}
-		//cout << "[BDSpyrunnerW] AEBVInventoryTransactionPacket " << packet.transaction->playerPosition.toString() << endl;
-		//cout << "[BDSpyrunnerW] AEBVInventoryTransactionPacket " << packet.transaction->clickPosition.toString() << endl;
+		// logger.debug(packet.transaction->playerPosition.toString(), "AEBVInventoryTransactionPacket");
+		// logger.debug(packet.transaction->clickPosition.toString(), "AEBVInventoryTransactionPacket");
 	}
 	return original(_this, nid, packet);
 }

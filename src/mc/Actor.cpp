@@ -5,7 +5,6 @@
 #include <mc/ScoreBoard.h>
 
 using namespace std;
-//创建包
 inline uintptr_t createPacket(int type) {
 	uintptr_t pkt[2];
 	SymCall("?createPacket@MinecraftPackets@@SA?AV?$shared_ptr@VPacket@@@std@@W4MinecraftPacketIds@@@Z",
@@ -18,13 +17,9 @@ string Actor::getNameTag() {
 		this);
 }
 
-//设置生物名称信息
-
 void Actor::setNameTag(const string& name) {
 	VirtualCall(0x1F8, this, &name);
 }
-
-//设置生物名称是否可见
 
 void Actor::setNameTagVisible(bool visible) {
 	SymCall("?setNameTagVisible@Actor@@UEAAX_N@Z", this, visible);
@@ -37,43 +32,27 @@ int Actor::getDimensionId() {
 	return did;
 }
 
-//获取生物当前所在坐标
 Vec3* Actor::getPos() {
 	return SymCall<Vec3*>("?getPosition@Actor@@UEBAAEBVVec3@@XZ", this);
 }
-
-//获取生物之前所在坐标
 
 Vec3* Actor::getPosPrev() {
 	return SymCall<Vec3*>("?getPosPrev@Actor@@UEBAAEBVVec3@@XZ", this);
 }
 
-//获取生物坐标的变化量
-//取消注释后 Actor::getPos() 获取的值也变成 Actor::getPosDelta() 获取的值，待修复
-/*
-Vec3* Actor::getPosDelta() {
-	return SymCall<Vec3*>("?getPosDelta@Actor@@QEBAAEBVVec3@@XZ", this);
-}
-*/
-
-//获取速度
 float Actor::getSpeedInMetersPerSecond() {
 	return SymCall<float>("?getSpeedInMetersPerSecond@Actor@@QEBAMXZ", this);
 }
-
-//是否悬空
 
 bool Actor::isStanding() {//IDA MovePlayerPacket::MovePlayerPacket
 	return Dereference<bool>(this, 472);
 }
 
-//是否潜行
-
 bool Actor::isSneaking() {
 	return SymCall<bool>("?isSneaking@Actor@@QEBA_NXZ", this);
 }
 
-//取方块源
+// Get block source
 
 BlockSource* Actor::getRegion() {
 	return SymCall<BlockSource*>("?getDimensionBlockSourceConst@Actor@@QEBAAEBVBlockSource@@XZ", this);
@@ -85,20 +64,14 @@ ItemStack* Actor::getArmor(int slot) {
 		this, slot);
 }
 
-//获取实体类型
-
 unsigned Actor::getEntityTypeId() {
 	//return VirtualCall<unsigned>(0x550, this);
 	return SymCall<unsigned>("?getEntityTypeId@Actor@@UEBA?AW4ActorType@@XZ", this);
 }
 
-//获取查询用ID
-
 uintptr_t Actor::getUniqueID() {
 	return SymCall<uintptr_t>("?getUniqueID@Actor@@QEBAAEBUActorUniqueID@@XZ", this);
 }
-
-//获取实体类型
 
 string Actor::getEntityTypeName() {
 	string type;
@@ -107,7 +80,7 @@ string Actor::getEntityTypeName() {
 	return type;
 }
 
-//属性
+// attributes
 uintptr_t Actor::updateAttrs() {
 	return SymCall<uintptr_t>("?_sendDirtyActorData@Actor@@QEAAXXZ", this);
 }
@@ -132,27 +105,25 @@ void Actor::setMaxValue(uintptr_t attr, float value) {
 	SymCall("?setMaxValue@AttributeInstance@@QEAAXM@Z", attr, value);
 }
 
-//获取地图信息
+// get level
 Level* Actor::getLevel() {
 	return SymCall<Level*>("?getCamera@Item@@UEBAPEAVICameraItemComponent@@XZ", this);
 }
 
-//添加一个状态
+// add a effect
 uintptr_t Actor::addEffect(uintptr_t ef) {
 	return SymCall<uintptr_t>("?addEffect@Actor@@QEAAXAEBVMobEffectInstance@@@Z", this, ef);
 }
 
-//生命值
+// get current health
 float Actor::getHealth() {
 	uintptr_t hattr = getAttrs(SYM("?HEALTH@SharedAttributes@@2VAttribute@@B"));
 	return getCurrentValue(hattr);
-	//return SymCall<int>("?getHealth@Actor@@QEBAHXZ", this);
 }
 
 float Actor::getMaxHealth() {
 	uintptr_t hattr = getAttrs(SYM("?HEALTH@SharedAttributes@@2VAttribute@@B"));
 	return getMaxValue(hattr);
-	//return SymCall<int>("?getMaxHealth@Actor@@QEBAHXZ", this);
 }
 
 void Actor::setHealth(float value) {
@@ -165,7 +136,7 @@ void Actor::setMaxHealth(float value) {
 	setMaxValue(hattr, value);
 }
 
-//获取副手
+// get off hand
 ItemStack* Actor::getOffhandSlot() {
 	return SymCall<ItemStack*>("?getOffhandSlot@Actor@@QEBAAEBVItemStack@@XZ", this);
 }
@@ -173,17 +144,13 @@ ItemStack* Actor::getOffhandSlot() {
 Tag* Actor::save() {
 	Tag* t = newTag(TagType::Compound);
 	VirtualCall(0x530, this, t);
-	//SymCall("?save@Actor@@UEAA_NAEAVCompoundTag@@@Z", this, t);
+	//SymCall("?save@Actor@@UEBA_NAEAVCompoundTag@@@Z", this, t);
 	return t;
 }
-
-//设置大小
 
 void Actor::setSize(float f1, float f2) {
 	SymCall("?setSize@Actor@@UEAAXMM@Z", this, f1, f2);
 }
-
-//获取状态列表
 
 auto Actor::getAllEffects() {
 	return SymCall<uintptr_t>("?getAllEffects@Actor@@QEBAAEBV?$vector@VMobEffectInstance@@V?$allocator@VMobEffectInstance@@@std@@@std@@XZ", this);
@@ -192,7 +159,7 @@ class TeleportRotationData {
 public:
 	char filler[32];
 };
-//传送
+
 void Actor::teleport(Vec3* target, int did) {
 	char mem[128];
 	TeleportRotationData data;
@@ -202,21 +169,15 @@ void Actor::teleport(Vec3* target, int did) {
 		this, &mem, 0);
 }
 
-//新增标签
-
 bool Actor::addTag(const string& str) {
 	return SymCall<bool>("?addTag@Actor@@QEAA_NAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z",
 		this, &str);
 }
 
-//移除标签
-
 bool Actor::removeTag(const string& str) {
 	return SymCall<bool>("?removeTag@Actor@@QEAA_NAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z",
 		this, &str);
 }
-
-//获取标签
 
 span<string> Actor::getTags() {
 	span<string> tags;
@@ -246,8 +207,6 @@ string Player::getUuid() {//IDA ServerNetworkHandler::_createNewPlayer 222
 	return p;
 }
 
-//根据地图信息获取玩家xuid
-
 string Player::getXuid() {
 	string xuid;
 	SymCall<string&>("?getXuid@Player@@UEBA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ",
@@ -255,7 +214,7 @@ string Player::getXuid() {
 	return xuid;
 }
 
-//获取网络标识符
+// Get network identifier
 
 NetworkIdentifier* Player::getClientId() {
 	return &getUserEntityIdentifierComponent()->nid;
@@ -266,44 +225,34 @@ NetworkIdentifier* Player::getClientId() {
 	//IDA ServerPlayer::setPermissions 34
 }
 
-//获取背包
-
 Container* Player::getInventory() {
 	return SymCall<Container*>("?getInventory@Player@@QEAAAEAVContainer@@XZ",
 		this);
 	//return Dereference<Container*, Dereference<uintptr_t, this + 3208) + 176);//IDA Player::getInventory
 }
 
-//获取装备容器
-
 Container* Player::getArmorContainer() {
 	return SymCall<Container*>("?getArmorContainer@Actor@@QEBAAEBVSimpleContainer@@XZ",
 		this);
 }
-
-//获取末影箱
 
 Container* Player::getEnderChestContainer() {
 	//IDA Player::Player Line751: v72 = (char *)this + 3792;
 	return Dereference<Container*>(this, 3792);
 }
 
-//设置一个装备
-
+// Set armor
 uintptr_t Player::setArmor(int i, ItemStack* item) {
 	return SymCall<uintptr_t>("?setArmor@ServerPlayer@@UEAAXW4ArmorSlot@@AEBVItemStack@@@Z",
 		this, i, item);
 }
-
-//设置副手
 
 uintptr_t Player::setOffhandSlot(ItemStack* item) {
 	return SymCall<uintptr_t>("?setOffhandSlot@Player@@UEAAXAEBVItemStack@@@Z",
 		this, item);
 }
 
-//添加一个物品
-
+// Add a item
 void Player::addItem(ItemStack* item) {
 	// waiting for fix, test console commands:
 	// pydebug
@@ -315,40 +264,33 @@ void Player::addItem(ItemStack* item) {
 	SymCall("?add@Player@@UEAA_NAEAVItemStack@@@Z", this, item);
 }
 
-//增加等级
-
+// Add exp level
 void Player::addLevel(int level) {
 	SymCall("?addLevels@Player@@UEAAXH@Z",
 		this, level);
 }
 
-//获取当前选中的框位置
-
+// Get the item currently in selected slot
 int Player::getSelectedItemSlot() {
 	return SymCall<int>("?getSelectedItemSlot@Player@@QEBAHXZ",
 		this);
 }
 
-//获取当前物品
-
+// Get the item currently in hand
 ItemStack* Player::getSelectedItem() {
 	return SymCall<ItemStack*>("?getSelectedItem@Player@@QEBAAEBVItemStack@@XZ",
 		this);
 }
 
-//获取背包物品
-
 ItemStack* Player::getInventoryItem(int slot) {
 	return getInventory()->getSlots()[slot];
 }
 
-//获取游戏时游玩权限
 PlayerPermissionLevel Player::getPlayerPermissionLevel() {
 	return SymCall<PlayerPermissionLevel>("?getPlayerPermissionLevel@Player@@QEBA?AW4PlayerPermissionLevel@@XZ",
 		this);
 }
 
-//设置游戏时命令权限
 void Player::setPermissions(PlayerPermissionLevel m) {
 	_Big_uint128 v93[8];
 	SymCall("?setPermissions@Player@@QEAAXW4CommandPermissionLevel@@@Z",

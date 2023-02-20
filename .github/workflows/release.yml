@@ -26,17 +26,17 @@ on:
       rel_title:
         description: 'Release Description Title'     
         required: false
-        default: 'v1.19.52a'
+        default: ''
         type: string
       rel_tag:
         description: 'Release Tag'     
         required: false
-        default: 'v1.19.52a'
+        default: ''
         type: string
       rel_desc_body:
         description: 'Release Description Body'     
         required: false
-        default: 'Adapt to BDS version: '
+        default: ''
         type: string
 
 jobs:
@@ -45,6 +45,33 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
+      - name: Set release info
+        id: rel_info
+        run: |
+          version=$(LC_ALL=en_US.utf8 grep -oP 'PYR_VERSION = "\K.*?(?=")' include/pyrw/Version.h)
+
+          echo "version=$version" >> $GITHUB_OUTPUT
+          echo "build_time=$(date +"%Y.%m.%d-%H%M")" >> $GITHUB_OUTPUT
+
+          if [ -z "${{ inputs.rel_tag }}" ]; then
+            echo "tag_name=$version" >> $GITHUB_OUTPUT
+          else
+            echo "tag_name=${{ inputs.rel_tag }}" >> $GITHUB_OUTPUT
+          fi
+          
+          if [ -z "${{ inputs.rel_title }}" ]; then
+            echo "title=$version" >> $GITHUB_OUTPUT
+          else
+            echo "title=${{ inputs.rel_title }}" >> $GITHUB_OUTPUT
+          fi
+          
+          if [ -z "${{ inputs.rel_desc_body }}" ]; then
+            echo "desc_body=$(git log -1 --pretty=%B)" >> $GITHUB_OUTPUT
+          else
+            echo "desc_body=${{ inputs.rel_desc_body }}" >> $GITHUB_OUTPUT
+          fi
+        shell: bash
 
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1
@@ -91,10 +118,10 @@ jobs:
         uses: softprops/action-gh-release@v0.1.15
         if: inputs.release
         with:
-          tag_name: ${{ inputs.rel_tag }}
-          name: ${{ inputs.rel_title }}
+          tag_name: ${{ steps.rel_info.outputs.tag_name }}
+          name: ${{ steps.rel_info.outputs.title }}
           prerelease: ${{ inputs.pre_release }}
-          body: ${{ inputs.rel_desc_body }}
+          body: ${{ steps.rel_info.outputs.desc_body }}
           files: |
             ./release/BDSpyrunnerW.dll
             ./release/BDSpyrunnerW.pdb

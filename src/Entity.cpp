@@ -145,7 +145,7 @@ static PyObject* getTypeName(PyObject* self, void*) {
 		return nullptr;
 	return ToPyStr(a->getEntityTypeName());
 }
-static PyObject*getNBTInfo(PyObject* self, void*) {
+static PyObject* getNBTInfo(PyObject* self, void*) {
 	Actor* a = PyEntity::asActor(self);
 	if (!a)
 		return nullptr;
@@ -593,27 +593,26 @@ PyGetSetDef PyEntity_GetSet[]{
 	{"pos", PyEntity::getPos, nullptr, nullptr},
 	{"did", PyEntity::getDimensionId, nullptr, nullptr},
 	{"is_standing", PyEntity::getIsStand, nullptr, nullptr},
-	/*Deprecated*/{"isstand", PyEntity::getIsStand, nullptr, nullptr},
 	{"is_sneaking", PyEntity::getIsSneaking, nullptr, nullptr},
-	/*Deprecated*/{"issneak", PyEntity::getIsSneaking, nullptr, nullptr},
 	{"typeid", PyEntity::getTypeID, nullptr, nullptr},
 	{"typename", PyEntity::getTypeName, nullptr, nullptr},
 	{"NBT", PyEntity::getNBTInfo, nullptr, nullptr},
-	/*Deprecated*/{"nbt", PyEntity::getNBTInfo, nullptr, nullptr},
 	{"health", PyEntity::getHealth, PyEntity::setHealth, nullptr},
 	{"maxhealth", PyEntity::getMaxHealth, PyEntity::setMaxHealth, nullptr},
 	{"perm", PyEntity::getPermissions, PyEntity::setPermissions, nullptr},
 	{"platform_online_id", PyEntity::getPlatformOnlineId, nullptr, nullptr},
-	/*Deprecated*/{"deviceid", PyEntity::getPlatformOnlineId, nullptr, nullptr},
 	{"platform", PyEntity::getPlatform, nullptr, nullptr},
-	/*Deprecated*/{"deviceos", PyEntity::getPlatform, nullptr, nullptr},
 	{"IP", PyEntity::getIP, nullptr, nullptr},
 	/*Deprecated*/{"ip", PyEntity::getIP, nullptr, nullptr},
+	/*Deprecated*/{"nbt", PyEntity::getNBTInfo, nullptr, nullptr},
+	/*Deprecated*/{"isstand", PyEntity::getIsStand, nullptr, nullptr},
+	/*Deprecated*/{"issneak", PyEntity::getIsSneaking, nullptr, nullptr},
+	/*Deprecated*/{"deviceos", PyEntity::getPlatform, nullptr, nullptr},
+	/*Deprecated*/{"deviceid", PyEntity::getPlatformOnlineId, nullptr, nullptr},
 	{nullptr}
 };
 //Entity Methods
 PyMethodDef PyEntity_Methods[]{
-	//{"getItem", (PyCFunction)PyEntity_GetItem, METH_VARARGS | METH_KEYWORDS, nullptr},
 	{"getAllItem", PyEntity_GetAllItem, METH_VARARGS, nullptr},
 	{"setAllItem", PyEntity_SetAllItem, METH_VARARGS, nullptr},
 	{"setHand", PyEntity_SetHand, METH_VARARGS, nullptr},
