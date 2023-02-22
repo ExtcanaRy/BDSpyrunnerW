@@ -16,7 +16,7 @@ auto Objective::createScoreboardId(Player* player) {
 }
 
 ScoreInfo* Objective::getPlayerScore(ScoreboardId* a2) {
-	char a1[12];
+	char a1[40];
 	return SymCall<ScoreInfo*>("?getPlayerScore@Objective@@QEBA?AUScoreInfo@@AEBUScoreboardId@@@Z",
 		this, a1, a2);
 }

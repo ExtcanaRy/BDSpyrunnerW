@@ -554,9 +554,9 @@ THOOK(onChangeDimension, bool, "?requestPlayerChangeDimension@Level@@UEAAXAEAVPl
 THOOK(onMobDie, void, "?die@Mob@@UEAAXAEBVActorDamageSource@@@Z",
 	Mob* _this, uintptr_t dmsg) {
 	EventCallBackHelper h(EventCode::onMobDie);
-	char v72;
-	//IDA Mob::die Line163  v16 = (_QWORD *)(*(__int64 (__fastcall **)(const struct ActorDamageSource *, char *))(*(_QWORD *)v2 + 88i64))(v2, & v91);
-	Actor* sa = _this->getLevel()->fetchEntity(*(uintptr_t*)((*(uintptr_t(__fastcall**)(uintptr_t, char*))(*(uintptr_t*)dmsg + 104))(dmsg, &v72)));
+	char v71[8];
+	//IDA Mob::die Line142  v18 = (_QWORD *)(*(__int64 (__fastcall **)(const struct ActorDamageSource *, char *))(*(_QWORD *)a2 + 104i64))(a2, v71);
+	Actor* sa = _this->getLevel()->fetchEntity(*(uintptr_t*)((*(uintptr_t(__fastcall**)(uintptr_t, char (*)[8]))(*(uintptr_t*)dmsg + 104))(dmsg, &v71)));
 	h
 		.insert("actor1", _this)
 		.insert("actor2", sa)
@@ -570,10 +570,10 @@ THOOK(onMobHurt, bool, "?_hurt@Mob@@MEAA_NAEBVActorDamageSource@@M_N1@Z",
 	Mob* _this, uintptr_t dmsg, float a3, bool a4, bool a5) {
 	EventCallBackHelper h(EventCode::onMobHurt);
 	g_damage = a3; // Set the value of Biological Injury to Adjustable
-	char v72;
+	char v71[8];
 	// getSourceUniqueId
 	//v21 = (_QWORD *)(*(__int64 (__fastcall **)(const struct ActorDamageSource *, char *))(*(_QWORD *)a2 + 104i64))(a2, v30);
-	Actor* sa = _this->getLevel()->fetchEntity(*(uintptr_t*)((*(uintptr_t(__fastcall**)(uintptr_t, char*))(*(uintptr_t*)dmsg + 104))(dmsg, &v72)));
+	Actor* sa = _this->getLevel()->fetchEntity(*(uintptr_t*)((*(uintptr_t(__fastcall**)(uintptr_t, char (*)[8]))(*(uintptr_t*)dmsg + 104))(dmsg, &v71)));
 	h
 		.insert("actor1", _this)
 		.insert("actor2", sa)
@@ -631,7 +631,7 @@ THOOK(onInputCommand, void, "?handle@ServerNetworkHandler@@UEAAXAEBVNetworkIdent
 	if (p) {
 		const string& cmd = Dereference<string>(pkt, 48);
 		auto data = g_commands.find(cmd.c_str() + 1);
-		//如果有这条命令且回调函数不为nullptr
+		// If this command is available and the callback function is not nullptr
 		if (data != g_commands.end() && data->second.second) {
 			//Py_BEGIN_CALL;
 			PyObject_CallFunction(data->second.second, "O", ToEntity(p));
@@ -652,7 +652,7 @@ THOOK(onSelectForm, void, "?handle@?$PacketHandlerDispatcherInstance@VModalFormR
 	uintptr_t pkt = *ppkt;
 	Player* p = handle->_getServerPlayer(id, pkt);
 	string data;
-	int fid = Dereference<int>(pkt, 48);
+	int formid = Dereference<int>(pkt, 48);
 
 	if (!Dereference<bool>(pkt, 81)) {
 		if (Dereference<bool>(pkt, 72)) {
@@ -669,10 +669,22 @@ THOOK(onSelectForm, void, "?handle@?$PacketHandlerDispatcherInstance@VModalFormR
 	
 	if (data.back() == '\n')
 		data.pop_back();
+
+	auto iter = g_forms.find(formid);
+	if (iter != g_forms.end()) {
+		//Py_BEGIN_CALL;
+		PyObject* func = g_forms[formid];
+		PyObject_CallFunction(func, "OO", ToEntity(p), PyUnicode_FromStringAndSize(data.c_str(), data.size()));
+		PrintPythonError();
+		//Py_END_CALL;
+		g_forms.erase(iter);
+		return original(_this, id, handle, ppkt);
+	}
+
 	h
 		.insert("player", p)
 		.insert("selected", data)
-		.insert("formid", fid);
+		.insert("formid", formid);
 	h.call();
 	original(_this, id, handle, ppkt);
 }

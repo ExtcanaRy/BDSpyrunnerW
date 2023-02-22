@@ -65,74 +65,86 @@ void LoadPythonModules(string moduleName) {
 }
 
 void InitPythonInterpreter(bool reinit) {
-	// shutdown interpreter & release resources
-	if (reinit) {
-		for (auto& [name, pModule] : g_py_modules) {
-			Py_DECREF(pModule);
-		}
-		g_py_modules.clear();
-		Py_FinalizeEx();
-	}
-	// init interpreter
-	if (!filesystem::exists(PLUGIN_PATH))
-		filesystem::create_directories(PLUGIN_PATH);
-	wstring py_path(PLUGIN_PATH L";"
-					PLUGIN_PATH "Dlls;"
-					PLUGIN_PATH "Lib;"
-					PLUGIN_PATH "Extra;");
-	py_path.append(Py_GetPath());
-	Py_SetPath(py_path.c_str());
-	// Add a module
-	if ((fopen((string(PLUGIN_PATH) + "mc.py").c_str(), "r")) == NULL)
-		PyImport_AppendInittab("mc", mc_init);
-	else
-		PyImport_AppendInittab("mco", mc_init);
-	Py_InitializeEx(0);
-	if (PyType_Ready(&PyEntity_Type) < 0) {
-		Py_FatalError("Can't initialize entity type");
-	}
-	PyEval_InitThreads();
-	// load modules
-	LoadPythonModules("");
-	// Executed before starting the child thread,
-	// in order to release the global lock obtained by PyEval_InitThreads, 
-	// which may not be available to the child thread otherwise.
-	if (!reinit)
-		PyEval_ReleaseThread(PyThreadState_Get());
-	// release current thread
-	//PyEval_SaveThread();
+    if (reinit) {
+        // shutdown interpreter & release resources
+        for (auto& [name, pModule] : g_py_modules) {
+            Py_DECREF(pModule);
+        }
+        g_py_modules.clear();
+        Py_FinalizeEx();
+    }
+
+    // init interpreter
+    if (!filesystem::exists(PLUGIN_PATH))
+        filesystem::create_directories(PLUGIN_PATH);
+
+    wstring py_path = PLUGIN_PATH L";" PLUGIN_PATH "Dlls;"
+                      PLUGIN_PATH "Lib;" PLUGIN_PATH "Extra;";
+	py_path += Py_GetPath();
+    Py_SetPath(py_path.c_str());
+
+    // Add a module
+    const char* moduleName = (fopen((string(PLUGIN_PATH) + "mc.py").c_str(), "r")) == NULL
+                                 ? "mc"
+                                 : "mco";
+    PyImport_AppendInittab(moduleName, mc_init);
+
+    Py_InitializeEx(0);
+
+    if (PyType_Ready(&PyEntity_Type) < 0) {
+        Py_FatalError("Can't initialize entity type");
+    }
+
+    PyEval_InitThreads();
+    LoadPythonModules("");
+
+    if (!reinit) {
+        PyThreadState* threadState = PyThreadState_Get();
+        PyEval_ReleaseThread(threadState);
+    }
 }
+
 //Reload Plugin
 static PyObject* reload(PyObject*, PyObject* args) {
-	const char* name = "";
+	const char* name;
 	Py_PARSE("s", &name);
 	ReloadPythonModules(name);
 	Py_RETURN_NONE;
 }
 
 static PyObject* setListener(PyObject*, PyObject* args) {
-	const char* name = ""; PyObject* func;
+    const char* name; PyObject* func;
 	Py_PARSE("sO", &name, &func);
-	auto it = events.find(name);
-	if (!PyFunction_Check(func))
-		Py_RETURN_ERROR("Parameter 2 is not callable");
-	if (it == events.end()) {
-		char err_msg[0x30] = "Invalid Listener key words: ";
-		strcat(err_msg, name);
-		Py_RETURN_ERROR(err_msg);
-	}
-	g_callback_functions[it->second].push_back(func);
-	Py_RETURN_NONE;
+    auto it = events.find(name);
+    if (!PyCallable_Check(func)) {
+        PyErr_SetString(PyExc_TypeError, "Parameter 2 is not callable");
+        return NULL;
+    }
+    if (it == events.end()) {
+        char err_msg[64];
+        snprintf(err_msg, sizeof(err_msg), "Invalid Listener key words: %s", name);
+        PyErr_SetString(PyExc_ValueError, err_msg);
+        return NULL;
+    }
+    g_callback_functions[it->second].push_back(func);
+    Py_RETURN_NONE;
 }
 
+
 static PyObject* removeListener(PyObject*, PyObject* args) {
-	const char* name = ""; PyObject* func;
+	const char* name; PyObject* func;
 	Py_PARSE("sO", &name, &func);
 	auto it = events.find(name);
-	if (!PyFunction_Check(func))
-		Py_RETURN_ERROR("Parameter 2 is not callable");
-	if (it == events.end())
-		Py_RETURN_ERROR("Invalid Listener key words");
+	if (!PyCallable_Check(func)) {
+        PyErr_SetString(PyExc_TypeError, "Parameter 2 is not callable");
+        return NULL;
+    }
+    if (it == events.end()) {
+        char err_msg[64];
+        snprintf(err_msg, sizeof(err_msg), "Invalid Listener key words: %s", name);
+        PyErr_SetString(PyExc_ValueError, err_msg);
+        return NULL;
+    }
 
 	auto& callbacks = g_callback_functions[it->second];
 	auto iter = std::find(callbacks.begin(), callbacks.end(), func);
@@ -148,26 +160,21 @@ static PyObject* removeListener(PyObject*, PyObject* args) {
 static PyObject* minVersionRequire(PyObject*, PyObject* args) {
 	int major, minor, micro;
 	Py_PARSE("iii", &major, &minor, &micro);
-	if (major > PYR_MAJOR_VERSION)
-		Py_RETURN_ERROR("The plugin version does not meet the minimum requirements");
-	if (minor > PYR_MINOR_VERSION)
-		Py_RETURN_ERROR("The plugin version does not meet the minimum requirements");
-	if (micro > PYR_MICRO_VERSION)
+	if (major > PYR_MAJOR_VERSION || minor > PYR_MINOR_VERSION || micro > PYR_MICRO_VERSION)
 		Py_RETURN_ERROR("The plugin version does not meet the minimum requirements");
 	Py_RETURN_NONE;
 }
 
 static PyObject* getBDSVersion(PyObject*, PyObject* args) {
-	args;
 	string version = SymCall<std::string>("?getServerVersionString@Common@@YA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ");
 	return ToPyStr(version);
 }
 
 static PyObject* logout(PyObject*, PyObject* args) {
-	const char* msg = "";
+	const char* msg;
 	Py_PARSE("s", &msg);
 	SymCall<ostream&>("??$_Insert_string@DU?$char_traits@D@std@@_K@std@@YAAEAV?$basic_ostream@DU?$char_traits@D@std@@@0@AEAV10@QEBD_K@Z",
-		&cout, msg, strlen(msg));
+		&cout, msg, strnlen_s(msg, sizeof(msg)));
 	Py_RETURN_NONE;
 }
 
@@ -189,7 +196,7 @@ constexpr int IsSlimeChunk(unsigned x, unsigned z) {
 }
 
 static PyObject* runCommand(PyObject*, PyObject* args) {
-	const char* cmd = "";
+	const char* cmd;
 	Py_PARSE("s", &cmd);
 	if (global<SPSCQueue> == nullptr)
 		Py_RETURN_ERROR("Command queue is not initialized");
@@ -199,8 +206,8 @@ static PyObject* runCommand(PyObject*, PyObject* args) {
 }
 
 static PyObject* setCommandDescription(PyObject*, PyObject* args) {
-	const char* cmd = "";
-	const char* des = "";
+	const char* cmd;
+	const char* des;
 	PyObject* callback = nullptr;
 	Py_PARSE("ss|O", &cmd, &des, &callback);
 	g_commands[cmd] = { des, callback };
@@ -208,7 +215,7 @@ static PyObject* setCommandDescription(PyObject*, PyObject* args) {
 }
 
 static PyObject* getPlayerByXuid(PyObject*, PyObject* args) {
-	const char* xuid = "";
+	const char* xuid;
 	Py_PARSE("s", &xuid);
 	Player* p = global<Level>->getPlayerByXuid(xuid);
 	if (p == nullptr)
@@ -231,7 +238,7 @@ static PyObject* setDamage(PyObject*, PyObject* args) {
 	Py_RETURN_NONE;
 }
 static PyObject* setServerMotd(PyObject*, PyObject* args) {
-	const char* name = "";
+	const char* name;
 	Py_PARSE("s", &name);
 	if (global<ServerNetworkHandler> == nullptr)
 		Py_RETURN_ERROR("Server did not finish loading");
@@ -255,7 +262,7 @@ static PyObject* getBlock(PyObject*, PyObject* args) {
 	);
 }
 static PyObject* setBlock(PyObject*, PyObject* args) {
-	const char* name = "";
+	const char* name;
 	BlockPos bp; int did;
 	Py_PARSE("siiii", &name, &bp.x, &bp.y, &bp.z, &did);
 	if (global<Level> == nullptr)
@@ -300,7 +307,7 @@ static PyObject* getStructure(PyObject*, PyObject* args) {
 static PyObject* setStructure(PyObject*, PyObject* args, PyObject* kwds) {
 	Py_KERWORDS_LIST("data", "x", "y", "x", "dim", "update");
 	bool update = true;
-	const char* data = "";
+	const char* data;
 	BlockPos pos; int did;
 	Py_PARSE_WITH_KERWORDS("siiii|b", &data, &pos.x, &pos.y, &pos.z, &did, &update);
 	if (global<Level> == nullptr)
@@ -431,7 +438,7 @@ static PyObject* explode(PyObject*, PyObject* args) {
 }
 
 static PyObject* spawnItem(PyObject*, PyObject* args) {
-	const char* data = "";
+	const char* data;
 	Vec3 pos; int did;
 	Py_PARSE("sfffi", &data, &pos.x, &pos.y, &pos.z, &did);
 	if (global<Level> == nullptr)
@@ -454,7 +461,7 @@ static PyObject* isSlimeChunk(PyObject*, PyObject* args) {
 }
 
 static PyObject* setSignBlockMessage(PyObject*, PyObject* args) {
-	const char* name = "";
+	const char* name;
 	BlockPos bp; int did;
 	Py_PARSE("siiii", &name, &bp.x, &bp.y, &bp.z, &did);
 	if (global<Level> == nullptr)

@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <unordered_map>
 #include <Windows.h>
 #include "CPython.h"
 #include <mc/Position.h>
@@ -22,3 +23,5 @@ inline PyObject* ToList(BlockPos* bp) {
 	return list;
 }
 PyObject* ToEntity(struct Actor* ptr);
+
+inline std::unordered_map<unsigned, PyObject*> g_forms;

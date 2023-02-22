@@ -292,7 +292,7 @@ PyObject* PyEntity_SetAllItem(PyObject* self, PyObject* args) {
 }
 
 PyObject* PyEntity_SetHand(PyObject* self, PyObject* args) {
-	const char* x = "";
+	const char* x;
 	if (PyArg_ParseTuple(args, "s:setHand", &x)) {
 		Player* p = PyEntity::asPlayer(self);
 		if (!p)
@@ -305,7 +305,7 @@ PyObject* PyEntity_SetHand(PyObject* self, PyObject* args) {
 }
 
 PyObject* PyEntity_AddItem(PyObject* self, PyObject* args) {
-	const char* x = "";
+	const char* x;
 	if (PyArg_ParseTuple(args, "s:addItem", &x)) {
 		Player* p = PyEntity::asPlayer(self);
 		if (!p)
@@ -358,7 +358,7 @@ PyObject* PyEntity_Teleport(PyObject* self, PyObject* args) {
 }
 
 PyObject* PyEntity_SendTextPacket(PyObject* self, PyObject* args) {
-	const char* msg = "";
+	const char* msg;
 	int mode = 0;
 	if (PyArg_ParseTuple(args, "s|i:sendTextPacket", &msg, &mode)) {
 		Player* p = PyEntity::asPlayer(self);
@@ -370,7 +370,7 @@ PyObject* PyEntity_SendTextPacket(PyObject* self, PyObject* args) {
 }
 
 PyObject* PyEntity_SendCommandPacket(PyObject* self, PyObject* args) {
-	const char* cmd = "";
+	const char* cmd;
 	if (PyArg_ParseTuple(args, "s:sendCommandPacket", &cmd)) {
 		Player* p = PyEntity::asPlayer(self);
 		if (!p)
@@ -389,7 +389,7 @@ PyObject* PyEntity_ResendAllChunks(PyObject* self, PyObject*) {
 }
 
 PyObject* PyEntity_Disconnect(PyObject* self, PyObject* args) {
-	const char* msg = "";
+	const char* msg;
 	if (PyArg_ParseTuple(args, "|s:disconnect", &msg)) {
 		Player* p = PyEntity::asPlayer(self);
 		if (!p)
@@ -400,7 +400,7 @@ PyObject* PyEntity_Disconnect(PyObject* self, PyObject* args) {
 }
 
 PyObject* PyEntity_GetScore(PyObject* self, PyObject* args) {
-	const char* objname = "";
+	const char* objname;
 	if (PyArg_ParseTuple(args, "s:getScore", &objname)) {
 		Player* p = PyEntity::asPlayer(self);
 		if (!p)
@@ -416,7 +416,7 @@ PyObject* PyEntity_GetScore(PyObject* self, PyObject* args) {
 }
 
 PyObject* PyEntity_ModifyScore(PyObject* self, PyObject* args) {
-	const char* objname = ""; int count; int mode;
+	const char* objname; int count; int mode;
 	if (PyArg_ParseTuple(args, "sii:modifyScore", &objname, &count, &mode)) {
 		Player* p = PyEntity::asPlayer(self);
 		if (!p)
@@ -442,7 +442,7 @@ PyObject* PyEntity_AddLevel(PyObject* self, PyObject* args) {
 }
 
 PyObject* PyEntity_TransferServer(PyObject* self, PyObject* args) {
-	const char* address = "";
+	const char* address;
 	unsigned short port;
 	if (PyArg_ParseTuple(args, "sH:transferServer", &address, &port)) {
 		Player* p = PyEntity::asPlayer(self);
@@ -454,50 +454,62 @@ PyObject* PyEntity_TransferServer(PyObject* self, PyObject* args) {
 }
 
 PyObject* PyEntity_SendCustomForm(PyObject* self, PyObject* args) {
-	const char* str = "";
-	if (PyArg_ParseTuple(args, "s:sendCustomForm", &str)) {
+	const char* str;
+	PyObject* callback = nullptr;
+	if (PyArg_ParseTuple(args, "s|O:sendCustomForm", &str, &callback)) {
 		Player* p = PyEntity::asPlayer(self);
 		if (!p)
 			return nullptr;
-		return PyLong_FromLong(p->sendModalFormRequestPacket(str));
+		auto formid = p->sendModalFormRequestPacket(str);
+		if (callback)
+			g_forms[formid] = callback;
+		return PyLong_FromLong(formid);
 	}
 	Py_RETURN_NONE;
 }
 
 PyObject* PyEntity_SendSimpleForm(PyObject* self, PyObject* args) {
-	const char* title = "";
-	const char* content = "";
-	const char* buttons = "";
-	if (PyArg_ParseTuple(args, "sss:sendSimpleForm", &title, &content, &buttons)) {
+	const char* title;
+	const char* content;
+	const char* buttons;
+	PyObject* callback = nullptr;
+	if (PyArg_ParseTuple(args, "sss|O:sendSimpleForm", &title, &content, &buttons, &callback)) {
 		Player* p = PyEntity::asPlayer(self);
 		if (!p)
 			return nullptr;
 		char str[4096];
 		sprintf_s(str, 4096, R"({"title":"%s","content":"%s","buttons":%s,"type":"form"})", title, content, buttons);
-		return PyLong_FromLong(p->sendModalFormRequestPacket(str));
+		auto formid = p->sendModalFormRequestPacket(str);
+		if (callback)
+			g_forms[formid] = callback;
+		return PyLong_FromLong(formid);
 	}
 	Py_RETURN_NONE;
 }
 
 PyObject* PyEntity_SendModalForm(PyObject* self, PyObject* args) {
-	const char* title = "";
-	const char* content = "";
-	const char* button1 = "";
-	const char* button2 = "";
-	if (PyArg_ParseTuple(args, "ssss:sendModalForm", &title, &content, &button1, &button2)) {
+	const char* title;
+	const char* content;
+	const char* button1;
+	const char* button2;
+	PyObject* callback = nullptr;
+	if (PyArg_ParseTuple(args, "ssss|O:sendModalForm", &title, &content, &button1, &button2, &callback)) {
 		Player* p = PyEntity::asPlayer(self);
 		if (!p)
 			return nullptr;
 		char str[4096];
 		sprintf_s(str, 4096, R"({"title":"%s","content":"%s","button1":"%s","button2":"%s","type":"modal"})", title, content, button1, button2);
-		return PyLong_FromLong(p->sendModalFormRequestPacket(str));
+		auto formid = p->sendModalFormRequestPacket(str);
+		if (callback)
+			g_forms[formid] = callback;
+		return PyLong_FromLong(formid);
 	}
 	Py_RETURN_NONE;
 }
 
 PyObject* PyEntity_SetSideBar(PyObject* self, PyObject* args) {
-	const char* title = "";
-	const char* data = "";
+	const char* title;
+	const char* data;
 	if (PyArg_ParseTuple(args, "ss:setSidebar", &title, &data)) {
 		Player* p = PyEntity::asPlayer(self);
 		if (!p)
@@ -525,7 +537,7 @@ PyObject* PyEntity_RemoveSideBar(PyObject* self, PyObject*) {
 }
 
 PyObject* PyEntity_SetBossBar(PyObject* self, PyObject* args) {
-	const char* name = "";
+	const char* name;
 	float per;
 	if (PyArg_ParseTuple(args, "sf:setBossbar", &name, &per)) {
 		Player* p = PyEntity::asPlayer(self);
@@ -545,7 +557,7 @@ PyObject* PyEntity_RemoveBossBar(PyObject* self, PyObject*) {
 }
 
 PyObject* PyEntity_AddTag(PyObject* self, PyObject* args) {
-	const char* tag = "";
+	const char* tag;
 	if (PyArg_ParseTuple(args, "s:addTag", &tag)) {
 		Actor* a = PyEntity::asActor(self);
 		if (!a)
@@ -556,7 +568,7 @@ PyObject* PyEntity_AddTag(PyObject* self, PyObject* args) {
 }
 
 PyObject* PyEntity_RemoveTag(PyObject* self, PyObject* args) {
-	const char* tag = "";
+	const char* tag;
 	if (PyArg_ParseTuple(args, "s:removeTag", &tag)) {
 		Actor* a = PyEntity::asActor(self);
 		if (!a)
