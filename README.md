@@ -19,7 +19,7 @@
 
 1. 下载``Release``中的``BDSpyrunnerW.dll``、``mc.py``和``BDSpyrunnerW.pdb``，pdb文件不是必须的，但是在崩溃时用于反馈会给我们带来很大便利
 2. 确保您已经安装了[LiteLoader](https://github.com/LiteLDev/LiteLoaderBDS)或[BDXCore](https://github.com/jfishing/BDXCore)
-3. 下载安装[Python3.7.9](https://www.python.org/ftp/python/3.7.9/python-3.7.9-amd64.exe)，安装时勾选 ``Add Python to Path``'
+3. 下载安装[Python3.7.9](https://www.python.org/ftp/python/3.7.9/python-3.7.9-amd64.exe)，安装时勾选 ``Add Python to Path``
 4. 将``BDSpyrunnerW.dll``和``BDSpyrunnerW.pdb``放入您用于存放插件的文件夹，如``plugins``、``bdxcore_mod``
 5. 将``mc.py``放入``plugins/py``文件夹
 
