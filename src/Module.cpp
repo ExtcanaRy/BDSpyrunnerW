@@ -113,7 +113,7 @@ static PyObject* reload(PyObject*, PyObject* args) {
 }
 
 static PyObject* setListener(PyObject*, PyObject* args) {
-    const char* name; PyObject* func;
+	const char* name = ""; PyObject* func;
 	Py_PARSE("sO", &name, &func);
     auto it = events.find(name);
     if (!PyCallable_Check(func)) {
@@ -132,7 +132,7 @@ static PyObject* setListener(PyObject*, PyObject* args) {
 
 
 static PyObject* removeListener(PyObject*, PyObject* args) {
-	const char* name; PyObject* func;
+	const char* name = ""; PyObject* func;
 	Py_PARSE("sO", &name, &func);
 	auto it = events.find(name);
 	if (!PyCallable_Check(func)) {
@@ -171,10 +171,10 @@ static PyObject* getBDSVersion(PyObject*, PyObject* args) {
 }
 
 static PyObject* logout(PyObject*, PyObject* args) {
-	const char* msg;
+	const char* msg = "";
 	Py_PARSE("s", &msg);
 	SymCall<ostream&>("??$_Insert_string@DU?$char_traits@D@std@@_K@std@@YAAEAV?$basic_ostream@DU?$char_traits@D@std@@@0@AEAV10@QEBD_K@Z",
-		&cout, msg, strnlen_s(msg, sizeof(msg)));
+		&cout, msg, strlen(msg));
 	Py_RETURN_NONE;
 }
 
@@ -196,7 +196,7 @@ constexpr int IsSlimeChunk(unsigned x, unsigned z) {
 }
 
 static PyObject* runCommand(PyObject*, PyObject* args) {
-	const char* cmd;
+	const char* cmd = "";
 	Py_PARSE("s", &cmd);
 	if (global<SPSCQueue> == nullptr)
 		Py_RETURN_ERROR("Command queue is not initialized");
@@ -206,8 +206,8 @@ static PyObject* runCommand(PyObject*, PyObject* args) {
 }
 
 static PyObject* setCommandDescription(PyObject*, PyObject* args) {
-	const char* cmd;
-	const char* des;
+	const char* cmd = "";
+	const char* des = "";
 	PyObject* callback = nullptr;
 	Py_PARSE("ss|O", &cmd, &des, &callback);
 	g_commands[cmd] = { des, callback };
@@ -215,7 +215,7 @@ static PyObject* setCommandDescription(PyObject*, PyObject* args) {
 }
 
 static PyObject* getPlayerByXuid(PyObject*, PyObject* args) {
-	const char* xuid;
+	const char* xuid = "";
 	Py_PARSE("s", &xuid);
 	Player* p = global<Level>->getPlayerByXuid(xuid);
 	if (p == nullptr)
@@ -238,7 +238,7 @@ static PyObject* setDamage(PyObject*, PyObject* args) {
 	Py_RETURN_NONE;
 }
 static PyObject* setServerMotd(PyObject*, PyObject* args) {
-	const char* name;
+	const char* name = "";
 	Py_PARSE("s", &name);
 	if (global<ServerNetworkHandler> == nullptr)
 		Py_RETURN_ERROR("Server did not finish loading");
@@ -262,7 +262,7 @@ static PyObject* getBlock(PyObject*, PyObject* args) {
 	);
 }
 static PyObject* setBlock(PyObject*, PyObject* args) {
-	const char* name;
+	const char* name = "";
 	BlockPos bp; int did;
 	Py_PARSE("siiii", &name, &bp.x, &bp.y, &bp.z, &did);
 	if (global<Level> == nullptr)
@@ -307,7 +307,7 @@ static PyObject* getStructure(PyObject*, PyObject* args) {
 static PyObject* setStructure(PyObject*, PyObject* args, PyObject* kwds) {
 	Py_KERWORDS_LIST("data", "x", "y", "x", "dim", "update");
 	bool update = true;
-	const char* data;
+	const char* data = "";
 	BlockPos pos; int did;
 	Py_PARSE_WITH_KERWORDS("siiii|b", &data, &pos.x, &pos.y, &pos.z, &did, &update);
 	if (global<Level> == nullptr)
@@ -438,7 +438,7 @@ static PyObject* explode(PyObject*, PyObject* args) {
 }
 
 static PyObject* spawnItem(PyObject*, PyObject* args) {
-	const char* data;
+	const char* data = "";
 	Vec3 pos; int did;
 	Py_PARSE("sfffi", &data, &pos.x, &pos.y, &pos.z, &did);
 	if (global<Level> == nullptr)
@@ -461,7 +461,7 @@ static PyObject* isSlimeChunk(PyObject*, PyObject* args) {
 }
 
 static PyObject* setSignBlockMessage(PyObject*, PyObject* args) {
-	const char* name;
+	const char* name = "";
 	BlockPos bp; int did;
 	Py_PARSE("siiii", &name, &bp.x, &bp.y, &bp.z, &did);
 	if (global<Level> == nullptr)
