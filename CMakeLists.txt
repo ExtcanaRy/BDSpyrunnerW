@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.21)
 
-project(plugin)
+project(BDSpyrunnerW)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_BUILD_TYPE Release)
@@ -51,11 +51,11 @@ set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /DEB
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /utf-8")
 
-add_library(plugin SHARED ${SRC_FILES_DIR})
+add_library(BDSpyrunnerW SHARED ${SRC_FILES_DIR})
 
-set_target_properties(plugin PROPERTIES OUTPUT_NAME "BDSpyrunnerW")
+set_target_properties(BDSpyrunnerW PROPERTIES OUTPUT_NAME "BDSpyrunnerW")
 
-target_link_libraries(plugin 
+target_link_libraries(BDSpyrunnerW 
 	"${CMAKE_SOURCE_DIR}/lib/LiteLoader.lib"
 	"${CMAKE_SOURCE_DIR}/lib/python37.lib"
 	"${CMAKE_SOURCE_DIR}/lib/WINHTTP.lib"
