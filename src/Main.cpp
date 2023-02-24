@@ -406,7 +406,7 @@ THOOK(onPlacedBlock, void, "?sendBlockPlacedByPlayer@BlockEventCoordinator@@QEAA
 	}
 	original(_this, p, b, bp, _bool);
 }
-// destory block
+// destroy block
 THOOK(onDestroyBlock, bool, "?checkBlockDestroyPermissions@BlockSource@@QEAA_NAEAVActor@@AEBVBlockPos@@AEBVItemStackBase@@_N@Z",
 	BlockSource* _this, Actor* a1, BlockPos* a2, ItemStack* a3, bool a4) {
 	EventCallBackHelper h(EventCode::onDestroyBlock);
