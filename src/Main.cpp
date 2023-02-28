@@ -1,8 +1,4 @@
 //Main.cpp plugin module
-#include <filesystem>
-#include <fstream>
-#include <thread>
-
 #include <mc/Actor.h>
 #include <mc/Block.h>
 #include <mc/ItemStack.h>
@@ -19,9 +15,6 @@
 #include <pyrw/Module.h>
 #include <pyrw/Logger.h>
 #include <pyrw/Version.h>
-
-using namespace std;
-namespace fs = filesystem;
 
 Logger logger("BDSpyrunnerW");
 
@@ -63,7 +56,7 @@ public:
 		arg_ = PyDict_New();
 		return *this;
 	}
-	EventCallBackHelper& insert(string_view key, PyObject* item) {
+	EventCallBackHelper& insert(std::string_view key, PyObject* item) {
 		if (arg_ == nullptr)
 			arg_ = PyDict_New();
 		PyDict_SetItemString(arg_, key.data(), item);
@@ -71,31 +64,31 @@ public:
 		//Py_PRINT_REFCOUNT(item);
 		return *this;
 	}
-	EventCallBackHelper& insert(string_view key, string_view item) {
+	EventCallBackHelper& insert(std::string_view key, std::string_view item) {
 		return insert(key, ToPyStr(item));
 	}
-	EventCallBackHelper& insert(string_view key, Actor* item) {
+	EventCallBackHelper& insert(std::string_view key, Actor* item) {
 		return insert(key, ToEntity(item));
 	}
-	EventCallBackHelper& insert(string_view key, BlockPos* item) {
+	EventCallBackHelper& insert(std::string_view key, BlockPos* item) {
 		return insert(key, ToList(item));
 	}
-	EventCallBackHelper& insert(string_view key, Vec3* item) {
+	EventCallBackHelper& insert(std::string_view key, Vec3* item) {
 		return insert(key, ToList(item));
 	}
-	EventCallBackHelper& insert(string_view key, short item) {
+	EventCallBackHelper& insert(std::string_view key, short item) {
 		return insert(key, PyLong_FromLong(item));
 	}
-	EventCallBackHelper& insert(string_view key, int item) {
+	EventCallBackHelper& insert(std::string_view key, int item) {
 		return insert(key, PyLong_FromLong(item));
 	}
-	EventCallBackHelper& insert(string_view key, unsigned item) {
+	EventCallBackHelper& insert(std::string_view key, unsigned item) {
 		return insert(key, PyLong_FromUnsignedLong(item));
 	}
-	EventCallBackHelper& insert(string_view key, float item) {
+	EventCallBackHelper& insert(std::string_view key, float item) {
 		return insert(key, PyLong_FromDouble(item));
 	}
-	EventCallBackHelper& insert(string_view key, void* item) {
+	EventCallBackHelper& insert(std::string_view key, void* item) {
     	return insert(key, PyLong_FromVoidPtr(item));
 	}
 private:
@@ -107,45 +100,9 @@ private:
 #pragma region Hook List
 THOOK(BDS_Main, int, "main",
 	int argc, char* argv[], char* envp[]) {
-#if 0
-	while (true) {
-		Tag* t = ObjecttoTag(StringToJson(R"(
-	             {
-	                "Block10": {
-	                    "name8": "minecraft:crafting_table",
-	                    "states10": null,
-	                    "version3": 17879555
-	                },
-	                "Count1": 64,
-	                "Damage2": 0,
-	                "Name8": "minecraft:crafting_table",
-	                "WasPickedUp1": 0,
-	                "tag10": {
-	                    "display10": {
-	                        "Lore9": [
-	                            "zheng bu chuo",
-	                            "hen bu cuo"
-	                        ]
-	                    }
-	                }
-	            }
-	)"));
-		cout << CompoundTagtoJson(t).dump(4) << endl;
-		t->deleteCompound();
-		delete t;
-	}
-#endif
-#if 0
-	// Pre-init 3.8+
-	PyPreConfig cfg;
-	PyPreConfig_InitPythonConfig(&cfg);
-	cfg.utf8_mode = 1;
-	cfg.configure_locale = 0;
-	Py_PreInitialize(&cfg);
-#endif
-	InitPythonInterpreter(false);
+	InitPythonInterpreter();
 	// logout version info
-	logger.info(PYR_VERSION + string(" loaded."));
+	logger.info(PYR_VERSION + std::string(" loaded."));
 	return original(argc, argv, envp);
 }
 // Constructor for Level		
@@ -218,10 +175,10 @@ THOOK(onServerStarted, void, "?startServerThread@ServerInstance@@QEAAXXZ",
 	original(_this);
 }
 // Console output, which is actually the underlying call to ostrram::operator<<
-THOOK(onConsoleOutput, ostream&, "??$_Insert_string@DU?$char_traits@D@std@@_K@std@@YAAEAV?$basic_ostream@DU?$char_traits@D@std@@@0@AEAV10@QEBD_K@Z",
-	ostream& _this, const char* str, uintptr_t size) {
+THOOK(onConsoleOutput, std::ostream&, "??$_Insert_string@DU?$char_traits@D@std@@_K@std@@YAAEAV?$basic_ostream@DU?$char_traits@D@std@@@0@AEAV10@QEBD_K@Z",
+	std::ostream& _this, const char* str, uintptr_t size) {
 	EventCallBackHelper h(EventCode::onConsoleOutput);
-	if (&_this == &cout) {
+	if (&_this == &std::cout) {
 		h.setArg(ToPyStr(str));
 		if (!h.call())
 			return _this;
@@ -246,7 +203,7 @@ std::vector<std::string> parseCmdArgv(const std::string& cmd) {
 }
 // Console input, which is actually the bottom of the command queue
 THOOK(onConsoleInput, bool, "??$inner_enqueue@$0A@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@?$SPSCQueue@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@$0CAA@@@AEAA_NAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z",
-	SPSCQueue* _this, string* cmd) {
+	SPSCQueue* _this, std::string* cmd) {
 	EventCallBackHelper h(EventCode::onConsoleInput);
 	static bool debug = false;
 	auto argv = parseCmdArgv(*cmd);
@@ -258,7 +215,7 @@ THOOK(onConsoleInput, bool, "??$inner_enqueue@$0A@AEBV?$basic_string@DU?$char_tr
 		}
 		else {
 			debug = true;
-			cout << ">>> ";
+			std::cout << ">>> ";
 		}
 		return false;
 	} else if (argv[0] == "pyreload") {
@@ -271,14 +228,14 @@ THOOK(onConsoleInput, bool, "??$inner_enqueue@$0A@AEBV?$basic_string@DU?$char_tr
 		return false;
 	} else if (argv[0] == "pyreinit") {
 		//Does not work fully and can cause crash
-		InitPythonInterpreter(true);
+		InitPythonInterpreter();
 		return false;
 	}
 	if (debug) {
 		//Py_BEGIN_CALL;
 		PyRun_SimpleString(cmd->c_str());
 		//Py_END_CALL;
-		cout << ">>> ";
+		std::cout << ">>> ";
 		return false;
 	}
 	h.setArg(ToPyStr(*cmd));
@@ -593,7 +550,7 @@ THOOK(onRespawn, void, "?respawn@Player@@UEAAXXZ",
 }
 // chat, title, msg, w...
 THOOK(onChat, void, "?fireEventPlayerMessage@MinecraftEventing@@AEAAXAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@000@Z",
-	uintptr_t _this, string* sender, string* target, string* msg, string* style) {
+	uintptr_t _this, std::string* sender, std::string* target, std::string* msg, std::string* style) {
 	EventCallBackHelper h(EventCode::onChat);
 	
 	if(sender && msg) {
@@ -615,7 +572,7 @@ THOOK(onInputText, void, "?handle@ServerNetworkHandler@@UEAAXAEBVNetworkIdentifi
 	EventCallBackHelper h(EventCode::onInputText);
 	Player* p = _this->_getServerPlayer(id, pkt);
 	if (p) {
-		const string& msg = Dereference<string>(pkt, 88);
+		const std::string& msg = Dereference<std::string>(pkt, 88);
 		h.insert("player", p)
 			.insert("msg", msg);
 		if (!h.call())
@@ -629,7 +586,7 @@ THOOK(onInputCommand, void, "?handle@ServerNetworkHandler@@UEAAXAEBVNetworkIdent
 	EventCallBackHelper h(EventCode::onInputCommand);
 	Player* p = _this->_getServerPlayer(id, pkt);
 	if (p) {
-		const string& cmd = Dereference<string>(pkt, 48);
+		const std::string& cmd = Dereference<std::string>(pkt, 48);
 		auto data = g_commands.find(cmd.c_str() + 1);
 		// If this command is available and the callback function is not nullptr
 		if (data != g_commands.end() && data->second.second) {
@@ -651,15 +608,15 @@ THOOK(onSelectForm, void, "?handle@?$PacketHandlerDispatcherInstance@VModalFormR
 	EventCallBackHelper h(EventCode::onSelectForm);
 	uintptr_t pkt = *ppkt;
 	Player* p = handle->_getServerPlayer(id, pkt);
-	string data;
+	std::string data;
 	int formid = Dereference<int>(pkt, 48);
 
 	if (!Dereference<bool>(pkt, 81)) {
 		if (Dereference<bool>(pkt, 72)) {
 			//Json::value_type* json = Dereference<Json::value_type*>(pkt, 56);
-			string dst;
+			std::string dst;
 			data = 
-				SymCall<string&>("?toStyledString@Value@Json@@QEBA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ",
+				SymCall<std::string&>("?toStyledString@Value@Json@@QEBA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ",
 					pkt + 56, &dst);
 		}
 	}
@@ -698,9 +655,9 @@ THOOK(onCommandBlockUpdate, void, "?handle@ServerNetworkHandler@@UEAAXAEBVNetwor
 		unsigned short mode = Dereference<unsigned short>(pkt, 60);
 		bool condition = Dereference<bool>(pkt, 62);
 		bool redstone = Dereference<bool>(pkt, 63);
-		string cmd = Dereference<string>(pkt, 72);
-		string output = Dereference<string>(pkt, 104);
-		string rawname = Dereference<string>(pkt, 136);
+		std::string cmd = Dereference<std::string>(pkt, 72);
+		std::string output = Dereference<std::string>(pkt, 104);
+		std::string rawname = Dereference<std::string>(pkt, 136);
 		int delay = Dereference<int>(pkt, 168);
 		h.insert("player", ToEntity(p))
 			.insert("mode", mode)
@@ -737,11 +694,11 @@ THOOK(onCommandBlockPerform, bool, "?_execute@CommandBlock@@AEBAXAEAVBlockSource
 	int mode = SymCall<int>("?getMode@CommandBlockActor@@QEBA?AW4CommandBlockMode@@AEAVBlockSource@@@Z", a3, a2);
 	// Unconditional:0, Conditional:1
 	bool condition = SymCall<bool>("?getConditionalMode@CommandBlockActor@@QEBA_NAEAVBlockSource@@@Z", a3, a2);
-	//SymCall<string&>("?getName@BaseCommandBlock@@QEBAAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ",
+	//SymCall<std::string&>("?getName@BaseCommandBlock@@QEBAAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ",
 	//	a3 + 200);
 	//a3 + 200 BaseCommandBlock
-	string cmd = Dereference<string>(a3, 256);
-	string rawname = Dereference<string>(a3, 288);
+	std::string cmd = Dereference<std::string>(a3, 256);
+	std::string rawname = Dereference<std::string>(a3, 288);
 	h
 		.insert("mode", mode)
 		.insert("condition", condition)
@@ -821,7 +778,7 @@ THOOK(onPistonPush, bool, "?_attachedBlockWalker@PistonBlockActor@@AEAA_NAEAVBlo
 	BlockActor* _this, BlockSource* bs, BlockPos* bp, unsigned a3, unsigned a4) {
 	EventCallBackHelper h(EventCode::onPistonPush);
 	BlockLegacy* blg = bs->getBlock(bp)->getBlockLegacy();
-	string bn = blg->getBlockName();
+	std::string bn = blg->getBlockName();
 	short bid = blg->getBlockItemID();
 	//BlockPos* bp2 = _this->getPosition();//will cause a crash
 	h.insert("blockname", bn)
@@ -959,9 +916,9 @@ THOOK(onUseSignBlock, uintptr_t, "?use@SignBlock@@UEBA_NAEAVPlayer@@AEBVBlockPos
 	EventCallBackHelper h(EventCode::onUseSignBlock);
 	BlockSource* bs = a1->getRegion();
 	BlockActor* ba = bs->getBlockEntity(a2);
-	string text;
+	std::string text;
 	// get sign block content
-	SymCall<string&>("?getImmersiveReaderText@SignBlockActor@@UEAA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@AEAVBlockSource@@@Z",
+	SymCall<std::string&>("?getImmersiveReaderText@SignBlockActor@@UEAA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@AEAVBlockSource@@@Z",
 		ba, &text, bs);
 	h.insert("player", a1)
 		.insert("text", text)
@@ -969,5 +926,25 @@ THOOK(onUseSignBlock, uintptr_t, "?use@SignBlock@@UEBA_NAEAVPlayer@@AEBVBlockPos
 	if (h.call())
 		return original(_this, a1, a2);
 	return 0;
+}
+
+THOOK(onLiquidSpread, bool, 
+	"?_canSpreadTo@LiquidBlockDynamic@@AEBA_NAEAVBlockSource@@AEBVBlockPos@@1E@Z",
+	uintptr_t _this, BlockSource *a2, BlockPos *dst_pos, BlockPos *src_pos, char a5)
+{
+	std::string src_name = a2->getBlock(src_pos)->getBlockLegacy()->getBlockName();
+	std::string dst_name = a2->getBlock(dst_pos)->getBlockLegacy()->getBlockName();
+
+	EventCallBackHelper h(EventCode::onLiquidSpread);
+	h
+		.insert("src_name", src_name)
+		.insert("src_pos", src_pos)
+		.insert("dst_name", dst_name)
+		.insert("dst_pos", dst_pos);
+
+	if (!h.call())
+		return false;
+	
+	return original(_this, a2, dst_pos, src_pos, a5);
 }
 #pragma endregion

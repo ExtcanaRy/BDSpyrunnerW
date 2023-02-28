@@ -64,16 +64,17 @@ void LoadPythonModules(string moduleName) {
 	}
 }
 
-void InitPythonInterpreter(bool reinit) {
-    if (reinit) {
-        // shutdown interpreter & release resources
-        for (auto& [name, pModule] : g_py_modules) {
-            Py_DECREF(pModule);
-        }
-        g_py_modules.clear();
-        Py_FinalizeEx();
-    }
+void ReInitPythonInterpreter() {
+	// shutdown interpreter & release resources
+	for (auto& [name, pModule] : g_py_modules) {
+		Py_DECREF(pModule);
+	}
+	g_py_modules.clear();
+	Py_FinalizeEx();
+	InitPythonInterpreter();
+}
 
+void InitPythonInterpreter() {
     // init interpreter
     if (!filesystem::exists(PLUGIN_PATH))
         filesystem::create_directories(PLUGIN_PATH);
@@ -98,10 +99,8 @@ void InitPythonInterpreter(bool reinit) {
     PyEval_InitThreads();
     LoadPythonModules("");
 
-    if (!reinit) {
-        PyThreadState* threadState = PyThreadState_Get();
-        PyEval_ReleaseThread(threadState);
-    }
+    PyThreadState* threadState = PyThreadState_Get();
+    PyEval_ReleaseThread(threadState);
 }
 
 //Reload Plugin

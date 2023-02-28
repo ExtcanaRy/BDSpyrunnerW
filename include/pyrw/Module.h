@@ -20,4 +20,5 @@ __int64 getCurrentTime();
 
 void ReloadPythonModules(std::string moduleName);
 void LoadPythonModules(std::string moduleName);
-void InitPythonInterpreter(bool reinit);
+void InitPythonInterpreter();
+void ReInitPythonInterpreter();
