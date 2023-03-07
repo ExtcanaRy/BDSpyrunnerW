@@ -52,6 +52,7 @@ enum class EventCode {
 	onBlockExploded,
 	onUseSignBlock,
 	onLiquidSpread,
+	onChatPkt,
 };
 
 inline const std::unordered_map<std::string, EventCode> events{
@@ -103,4 +104,5 @@ inline const std::unordered_map<std::string, EventCode> events{
 	{ "onBlockExploded", EventCode::onBlockExploded },
 	{ "onUseSignBlock", EventCode::onUseSignBlock },
 	{ "onLiquidSpread", EventCode::onLiquidSpread },
+	{ "onChatPkt", EventCode::onChatPkt },
 };

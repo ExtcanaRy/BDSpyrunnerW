@@ -947,4 +947,27 @@ THOOK(onLiquidSpread, bool,
 	
 	return original(_this, a2, dst_pos, src_pos, a5);
 }
+THOOK(onChatPkt, uintptr_t, 
+	"?createChat@TextPacket@@SA?AV1@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@000@Z",
+	uintptr_t a1, std::string *name, std::string *msg, std::string *xuid, std::string &a4)
+{
+	Player *player = global<Level>->getPlayerByXuid(*xuid);
+
+	const char *name_c_str = name->c_str();
+	const char *msg_c_str = msg->c_str();
+	
+	EventCallBackHelper h(EventCode::onChatPkt);
+	h
+		.insert("player", player)
+		.insert("name_ptr", &name_c_str)
+		.insert("msg_ptr", &msg_c_str)
+		.insert("xuid", xuid);
+
+	h.call();
+
+	std::string name_mod(name_c_str);
+	std::string msg_mod(msg_c_str);
+
+	return original(a1, &name_mod, &msg_mod, xuid, a4);
+}
 #pragma endregion

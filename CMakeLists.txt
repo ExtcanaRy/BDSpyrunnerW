@@ -47,6 +47,11 @@ add_compile_options(
     /Zi
 )
 
+add_link_options(
+    /LTCG
+    /INCREMENTAL:NO
+)
+
 set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /DEBUG /OPT:REF /OPT:ICF")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /utf-8")
