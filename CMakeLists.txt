@@ -52,6 +52,8 @@ add_link_options(
     /INCREMENTAL:NO
 )
 
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /NODEFAULTLIB:MSVCRTD")
+
 set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /DEBUG /OPT:REF /OPT:ICF")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /utf-8")
@@ -61,7 +63,6 @@ add_library(BDSpyrunnerW SHARED ${SRC_FILES_DIR})
 set_target_properties(BDSpyrunnerW PROPERTIES OUTPUT_NAME "BDSpyrunnerW")
 
 target_link_libraries(BDSpyrunnerW 
-	"${CMAKE_SOURCE_DIR}/lib/LiteLoader.lib"
 	"${CMAKE_SOURCE_DIR}/lib/python37.lib"
-	"${CMAKE_SOURCE_DIR}/lib/WINHTTP.lib"
+	"${CMAKE_SOURCE_DIR}/lib/minhook.x64d.lib"
 )

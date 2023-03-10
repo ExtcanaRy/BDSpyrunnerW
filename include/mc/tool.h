@@ -1,8 +1,8 @@
 #pragma once
 #pragma execution_character_set("utf-8")
 #pragma warning(disable:4996)
-#pragma comment(lib, "LiteLoader.lib")
 #include <iostream>
+#include <hooker/hook.h>
 #include "Level.h"
 #include "NetWork.h"
 
@@ -23,23 +23,8 @@ template <typename T>
 inline T& Dereference(uintptr_t ptr) {
 	return *reinterpret_cast<T*>(ptr);
 }
-#define SYM dlsym_real
-#define THOOK(name, ret, sym, ...)		\
-struct name {							\
-	using func = ret(__VA_ARGS__);		\
-	static func _hook;					\
-	inline static func* original;		\
-	inline static HookRegister _reg =	\
-		{ sym,&original,&_hook };	\
-};										\
-ret name::_hook(__VA_ARGS__)
+#define SYM dlsym
 
-extern "C" {
-	// provide Detours API
-	_declspec(dllimport) int HookFunction(void* orifunc, void* orifuncptr, void* newfunc);
-	// get address from symbol string
-	_declspec(dllimport) void* dlsym_real(const char* symbol);
-}
 // call a virtual function
 // _this: this ptr, off: offsetof function
 template<typename ReturnType = void, typename... Args>
@@ -55,21 +40,6 @@ inline ReturnType SymCall(const char* sym, Args... args) {
 	}
 	return reinterpret_cast<ReturnType(*)(Args...)>(func)(std::forward<Args>(args)...);
 }
-// replace the function
-struct HookRegister {
-	HookRegister(const char* sym, void* org, void* hook) {
-		void* func = SYM(sym);
-		if (func == nullptr) {
-			std::cerr << "FailedToHook: " << sym << std::endl;
-			return;
-		}
-		auto ret = HookFunction(func, org, hook);
-		if (ret != 0) {
-			std::cerr << "FailedToHook: " << func << std::endl;
-			return;
-		}
-	}
-};
 
 template <typename T>
 inline T* global = nullptr;
