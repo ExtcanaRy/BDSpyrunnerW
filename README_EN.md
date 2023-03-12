@@ -12,8 +12,8 @@
 ## Introduction
 
 ``BDSpyrunnerW`` is a plug-in loader for ``BDS`` (Bedrock Dedicated Server).
-It uses CPython and Detours to connect Python and BDS so that Python can operate some things in Minecraft.
-It greatly reduces the threshold for plug-in development and effectively simplifies the cost of plug-in development.
+It uses CPython and MinHook to connect Python and BDS so that Python can operate some things in Minecraft.
+It greatly reduces the threshold for plug-in development and effectively simplifies the cost of plugin development.
 
 ## Usage
 

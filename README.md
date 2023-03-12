@@ -12,7 +12,7 @@
 ## 简介
 
 ``BDSpyrunnerW``是一个用于``BDS``(Bedrock Dedicated Server)的插件加载器。
-它使用了 CPython 和 Detours，来连接Python与BDS，使得Python可以操作Minecraft中的一些事物。
+它使用了 CPython 和 MinHook，来连接Python与BDS，使得Python可以操作Minecraft中的一些事物。
 极大的降低了插件开发门槛，有效简化了插件的开发成本。
 
 ## 用法
