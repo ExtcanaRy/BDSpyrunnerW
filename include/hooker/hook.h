@@ -10,8 +10,8 @@
 #include <stdint.h>
 
 #define SYM_FILE "bedrock_server_sym.txt"
-#define SYM_CACHE_FILE "bedrock_server_sym_cache.txt"
-#define SYM_CACHE_SIZE 1024
+#define SYM_CACHE_FILE "bedrock_server_sym_cache.bin"
+#define SYM_CACHE_SIZE 655360
 
 #define CVDUMP_URL "https://raw.github.com/microsoft/microsoft-pdb/master/cvdump/cvdump.exe"
 #define CVDUMP_EXE_PATH "cvdump.exe"
@@ -107,6 +107,8 @@
 extern "C" {
 #endif
 
+void save_sym_cache();
+void load_sym_cache();
 bool hook_func(void *hook_func, void *detour_func, void *original_func);
 void *get_rva_func(unsigned int rva);
 void *dlsym(const char *sym);

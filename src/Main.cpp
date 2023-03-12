@@ -25,7 +25,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 {
     switch (ul_reason_for_call) {
     case DLL_PROCESS_ATTACH:
-        if (MH_Initialize() != MH_OK) 
+	    load_sym_cache();
+        if (MH_Initialize() != MH_OK)
             return false;
         load_plugin();
         break;
@@ -35,6 +36,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
         break;
     case DLL_PROCESS_DETACH:
         MH_Uninitialize();
+		save_sym_cache();
         break;
     }
     return true;
