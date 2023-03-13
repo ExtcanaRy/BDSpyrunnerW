@@ -403,6 +403,21 @@ TMHOOK(onDestroyBlock, bool, "?checkBlockDestroyPermissions@BlockSource@@QEAA_NA
 	}
 	return onDestroyBlock.original(_this, a1, a2, a3, a4);
 }
+// destroyed block
+TMHOOK(onDestroyedBlock, void, "?sendBlockDestroyedByPlayer@BlockEventCoordinator@@QEAAXAEAVPlayer@@AEBVBlock@@AEBVBlockPos@@@Z",
+    uintptr_t _this, Player* p, Block* b, BlockPos* bp) {
+	EventCallBackHelper h(EventCode::onDestroyedBlock);
+	if (IsPlayer(p)) {
+		BlockLegacy* bl = b->getBlockLegacy();
+		h
+			.insert("player", p)
+			.insert("blockname", bl->getBlockName())
+			.insert("blockid", bl->getBlockItemID())
+			.insert("position", bp);
+		h.call();
+	}
+	onDestroyedBlock.original(_this, p, b, bp);
+}
 // open chest
 TMHOOK(onOpenChest, bool, "?use@ChestBlock@@UEBA_NAEAVPlayer@@AEBVBlockPos@@E@Z",
 	uintptr_t _this, Player* p, BlockPos* bp) {
@@ -1028,6 +1043,7 @@ bool init_hooks(void)
 	onPlaceBlock.init(&onPlaceBlock);
 	onPlacedBlock.init(&onPlacedBlock);
 	onDestroyBlock.init(&onDestroyBlock);
+	onDestroyedBlock.init(&onDestroyedBlock);
 	onOpenChest.init(&onOpenChest);
 	onOpenBarrel.init(&onOpenBarrel);
 	onCloseChest.init(&onCloseChest);
