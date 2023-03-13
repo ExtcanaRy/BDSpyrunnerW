@@ -114,6 +114,11 @@ void *get_rva_func(unsigned int rva);
 void *dlsym(const char *sym);
 bool release_cvdump_exe(void);
 
+bool hooker_init(void);
+bool hooker_uninit(void);
+bool hooker_enable_all_hook(void);
+bool hooker_disable_all_hook(void);
+
 #ifdef __cplusplus
 }
 #endif

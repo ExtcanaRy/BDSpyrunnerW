@@ -84,11 +84,6 @@ bool hook_func(void *hook_func, void *detour_func, void *original_func)
         printf("Failed to create func hook, RVA: %llu \n", (uintptr_t)hook_func);
         return false;
     }
-    if (MH_EnableHook(hook_func) != MH_OK)
-    {
-        printf("Failed to enable func hook, RVA: %llu \n", (uintptr_t)hook_func);
-        return false;
-    }
     return true;
 }
 
@@ -185,4 +180,42 @@ bool release_cvdump_exe(void)
         printf("Release resource cvdump.exe failed.\n");
         return false;
     }
+}
+
+//////////////////// MinHook ////////////////////
+
+bool hooker_init(void)
+{
+    if (MH_Initialize() != MH_OK)
+        return false;
+        
+    return true;
+}
+
+bool hooker_uninit(void)
+{
+    if (MH_Uninitialize() != MH_OK)
+        return false;
+        
+    return true;
+}
+
+bool hooker_enable_all_hook(void)
+{
+    if (MH_QueueEnableHook(MH_ALL_HOOKS) != MH_OK)
+        return false;
+    if (MH_ApplyQueued() != MH_OK)
+        return false;
+
+    return true;
+}
+
+bool hooker_disable_all_hook(void)
+{
+    if (MH_QueueDisableHook(MH_ALL_HOOKS)!= MH_OK)
+        return false;
+    if (MH_ApplyQueued()!= MH_OK)
+        return false;
+
+    return true;
 }

@@ -25,9 +25,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 {
     switch (ul_reason_for_call) {
     case DLL_PROCESS_ATTACH:
+		hooker_init();
 	    load_sym_cache();
-        if (MH_Initialize() != MH_OK)
-            return false;
         load_plugin();
         break;
     case DLL_THREAD_ATTACH:
@@ -35,7 +34,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
     case DLL_THREAD_DETACH:
         break;
     case DLL_PROCESS_DETACH:
-        MH_Uninitialize();
+        hooker_uninit();
 		save_sym_cache();
         break;
     }
@@ -1067,6 +1066,8 @@ bool init_hooks(void)
 	onUseSignBlock.init(&onUseSignBlock);
 	onLiquidSpread.init(&onLiquidSpread);
 	onChatPkt.init(&onChatPkt);
+
+	hooker_enable_all_hook();
 
     return true;
 }
