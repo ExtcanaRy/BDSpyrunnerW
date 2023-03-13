@@ -247,7 +247,7 @@ TMHOOK(onConsoleInput, bool, "??$inner_enqueue@$0A@AEBV?$basic_string@DU?$char_t
 			ReloadPythonModules("");
 		}
 		else if (argv.size() == 2) {
-			ReloadPythonModules(argv[1]);
+			LoadPythonModules(argv[1]);
 		}
 		return false;
 	} else if (argv[0] == "pyreinit") {

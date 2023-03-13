@@ -43,13 +43,13 @@ void LoadPythonModules(string moduleName) {
 			//ignore files starting with '_'
 			if (name.front() == '_')
 				continue;
+			// check if this is the module we want to load
+			if (!moduleName.empty() && name != moduleName) {
+				continue;
+			}
 			if (g_py_modules.find(name) != g_py_modules.end()) {
 				logger.info(name + " already loaded, reloading...");
 				ReloadPythonModules(name);
-				continue;
-			}
-			// check if this is the module we want to load
-			if (!moduleName.empty() && name != moduleName) {
 				continue;
 			}
 			logger.info("Loading " + name);
