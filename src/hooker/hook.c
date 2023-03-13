@@ -1,80 +1,5 @@
 #include <hooker/hook.h>
 
-/////////////////////////// CACHE API ////////////////////////
-typedef struct {
-    unsigned int rva;
-} symbol_cache_entry_t;
-
-static symbol_cache_entry_t symbol_cache[SYM_CACHE_SIZE] = {0};
-
-void save_sym_cache()
-{
-    FILE *fp = fopen(SYM_CACHE_FILE, "wb");
-    if (!fp)
-    {
-        perror("Unable to open symbol cache file for writing");
-        return;
-    }
-    fwrite(symbol_cache, sizeof(symbol_cache_entry_t), SYM_CACHE_SIZE, fp);
-    fclose(fp);
-}
-
-void load_sym_cache()
-{
-    FILE *fp = fopen(SYM_CACHE_FILE, "rb");
-    if (!fp)
-        return;
-
-    fread(symbol_cache, sizeof(symbol_cache_entry_t), SYM_CACHE_SIZE, fp);
-    fclose(fp);
-}
-
-//////////////////////// HASH SYM /////////////////////
-bool is_prime(int n)
-{
-    if (n <= 1)
-        return false;
-
-    for (int i = 2; i * i <= n; i++)
-    {
-        if (n % i == 0)
-            return false;
-    }
-    return true;
-}
-
-int find_closest_prime(int n)
-{
-    if (n <= 2)
-        return 2;
-
-    if (is_prime(n))
-        return n;
-
-    int lower = n - 1;
-    while (true)
-    {
-        if (is_prime(lower))
-            return lower;
-
-        lower--;
-    }
-}
-
-static unsigned short hash_str(const char* str)
-{
-    unsigned int hash = 0;
-    int c;
-    static unsigned int prime = 0;
-    
-    if (!prime)
-        prime = find_closest_prime(SYM_CACHE_SIZE);
-
-    while ((c = *str++))
-        hash = ((hash << 5) + hash) ^ c;
-
-    return hash % prime;
-}
 
 //////////////////////////// HOOK API /////////////////////////
 bool hook_func(void *hook_func, void *detour_func, void *original_func)
@@ -110,13 +35,18 @@ void *dlsym(const char *sym)
     static bool is_sym_file_generated = false;
     unsigned int rva_val = 0;
 
-    unsigned int sym_hash = hash_str(sym);
-    symbol_cache_entry_t *cache_entry = &symbol_cache[sym_hash];
-    if (cache_entry->rva != 0)
-        return get_rva_func(cache_entry->rva);
-
-    load_sym_cache();
-
+    rva_val = get_rva_from_hashmap(sym);
+    if (rva_val == -1)
+    {
+        load_hashmap_from_file(SYM_CACHE_FILE);
+        rva_val = get_rva_from_hashmap(sym);
+        if (rva_val != -1)
+            return get_rva_func(rva_val);
+    }
+    else
+    {
+        return get_rva_func(rva_val);
+    }
     FILE *fp = fopen(SYM_FILE, "r");
     if (!fp)
     {
@@ -141,7 +71,7 @@ void *dlsym(const char *sym)
     }
 
     const size_t MAX_LINE_LENGTH = 4096;
-    char *line = malloc(MAX_LINE_LENGTH * sizeof(char));
+    char *line = (char*)malloc(MAX_LINE_LENGTH);
 
     if (!line)
         return NULL;
@@ -155,9 +85,8 @@ void *dlsym(const char *sym)
         }
     }
     
-    cache_entry->rva = rva_val;
-
-    save_sym_cache();
+    add_entry(sym, rva_val);
+    save_hashmap_to_file(SYM_CACHE_FILE);
 
     free(line);
     fclose(fp);
@@ -186,6 +115,7 @@ bool release_cvdump_exe(void)
 
 bool hooker_init(void)
 {
+    load_hashmap_from_file(SYM_CACHE_FILE);
     if (MH_Initialize() != MH_OK)
         return false;
         
@@ -194,6 +124,8 @@ bool hooker_init(void)
 
 bool hooker_uninit(void)
 {
+    save_hashmap_to_file(SYM_CACHE_FILE);
+    free_hashmap();
     if (MH_Uninitialize() != MH_OK)
         return false;
         

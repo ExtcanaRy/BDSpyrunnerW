@@ -2,6 +2,7 @@
 #pragma comment(lib, "minhook.x64d.lib")
 #include "minhook/MinHook.h"
 #include "cvdump_exe_res.h"
+#include "hashmap.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,7 +12,6 @@
 
 #define SYM_FILE "bedrock_server_sym.txt"
 #define SYM_CACHE_FILE "bedrock_server_sym_cache.bin"
-#define SYM_CACHE_SIZE 655360
 
 #define CVDUMP_URL "https://raw.github.com/microsoft/microsoft-pdb/master/cvdump/cvdump.exe"
 #define CVDUMP_EXE_PATH "cvdump.exe"

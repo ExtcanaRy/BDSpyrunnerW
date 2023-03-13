@@ -26,7 +26,6 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
     switch (ul_reason_for_call) {
     case DLL_PROCESS_ATTACH:
 		hooker_init();
-	    load_sym_cache();
         load_plugin();
         break;
     case DLL_THREAD_ATTACH:
@@ -35,7 +34,6 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
         break;
     case DLL_PROCESS_DETACH:
         hooker_uninit();
-		save_sym_cache();
         break;
     }
     return true;
