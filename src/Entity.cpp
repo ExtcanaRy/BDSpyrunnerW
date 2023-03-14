@@ -661,7 +661,7 @@ PyTypeObject PyEntity_Type{
 	sizeof(PyEntity),		/* tp_basicsize */
 	0,						/* tp_itemsize */
 	nullptr,				/* tp_dealloc */
-	PyEntity::print,		/* tp_print */
+	(Py_ssize_t)PyEntity::print,	/* tp_print */
 	nullptr,				/* tp_getattr */
 	nullptr,				/* tp_setattr */
 	nullptr,				/* tp_reserved */

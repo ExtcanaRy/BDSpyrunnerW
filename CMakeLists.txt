@@ -63,6 +63,6 @@ add_library(BDSpyrunnerW SHARED ${SRC_FILES_DIR})
 set_target_properties(BDSpyrunnerW PROPERTIES OUTPUT_NAME "BDSpyrunnerW")
 
 target_link_libraries(BDSpyrunnerW 
-	"${CMAKE_SOURCE_DIR}/lib/python37.lib"
+	"${CMAKE_SOURCE_DIR}/lib/python39.lib"
 	"${CMAKE_SOURCE_DIR}/lib/minhook.x64d.lib"
 )

@@ -1,7 +1,7 @@
 #pragma once
-#pragma comment(lib, "python37.lib")
+#pragma comment(lib, "python39.lib")
 #define PY_SSIZE_T_CLEAN
-#include <CPython/Python.h>
+#include <CPython39/Python.h>
 
 #define Py_PARSE(format,...) if (!PyArg_ParseTuple(args, format ":" __FUNCTION__, __VA_ARGS__))return nullptr
 #define Py_KERWORDS_LIST(...) static const char* kwlist[]{ __VA_ARGS__,nullptr }
