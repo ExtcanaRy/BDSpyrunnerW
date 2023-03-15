@@ -117,9 +117,15 @@ def testonPlacedBlock(e):
 # status: pass
 
 def testonDestroyBlock(e):
-	logout(f"Listener onDestroyBlock l_e['position'] = {list_to_str(e['position'])}, {e['position'][1]}, {e['position'][2]}）, b_e['player'].is_sneaking = {e['player'].is_sneaking}") # issneak -> is_sneaking
+	logout(f"Listener onDestroyBlock l_e['position'] = {list_to_str(e['position'])}, {e['position'][1]}, {e['position'][2]}, b_e['player'].is_sneaking = {e['player'].is_sneaking}") # issneak -> is_sneaking
 	#mc.removeListener("onDestroyBlock", testonDestroyBlock)
 #mc.setListener("onDestroyBlock", testonDestroyBlock)
+# status: pass
+
+def testonDestroyedBlock(e):
+	logout(f"Listener onDestroyedBlock l_e['position'] = {list_to_str(e['position'])}, {e['position'][1]}, {e['position'][2]}, b_e['player'].is_sneaking = {e['player'].is_sneaking}") # issneak -> is_sneaking
+	#mc.removeListener("onDestroyedBlock", testonDestroyedBlock)
+#mc.setListener("onDestroyedBlock", testonDestroyedBlock)
 # status: pass
 
 def testonOpenContainer(e):
@@ -135,7 +141,7 @@ def testonCloseContainer(e):
 # status: pass
 
 def testonContainerChange(e):
-	logout('Listener onContainerChange l_e["position"] = （%f,%f,%f）, i_itemid = %d, i_itemcount = %d, s_IP = %s' %
+	logout('Listener onContainerChange l_e["position"] = (%f,%f,%f), i_itemid = %d, i_itemcount = %d, s_IP = %s' %
 												(e['position'][0], e['position'][1], e['position'][2], e['itemid'], e['itemcount'], e['player'].IP))
 	#mc.removeListener("onContainerChange", testonContainerChange)
 #mc.setListener("onContainerChange", testonContainerChange)
