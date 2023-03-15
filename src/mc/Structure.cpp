@@ -16,8 +16,11 @@ StructureSettings::~StructureSettings() {
 }
 
 StructureTemplate::StructureTemplate(const span<char>& s) {
-	SymCall("??0StructureTemplate@@QEAA@V?$basic_string_span@$$CBD$0?0@gsl@@@Z",
-		this, s);
+	char v32[16];
+	Level *Camera = global<Level>;
+	uintptr_t v11 = VirtualCall<uintptr_t>(2440, Camera, Camera, v32);
+	SymCall("??0StructureTemplate@@QEAA@V?$basic_string_view@DU?$char_traits@D@std@@@std@@V?$NonOwnerPointer@VIUnknownBlockTypeRegistry@@@Bedrock@@@Z",
+		this, s, v11);
 }
 
 StructureTemplate::~StructureTemplate() {
