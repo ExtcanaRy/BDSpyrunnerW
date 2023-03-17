@@ -80,7 +80,10 @@ void InitPythonInterpreter() {
         filesystem::create_directories(PLUGIN_PATH);
 
     wstring py_path = PLUGIN_PATH L";" PLUGIN_PATH "Dlls;"
-                      PLUGIN_PATH "Lib;" PLUGIN_PATH "Extra;";
+                      PLUGIN_PATH "Lib;" PLUGIN_PATH "Extra;"
+                      PLUGIN_PATH "env;" PLUGIN_PATH "env\\python39.zip;"
+                      PLUGIN_PATH "env\\Dlls;" PLUGIN_PATH "env\\Lib;"
+                      PLUGIN_PATH "env\\Lib\\site-packages;";
 	py_path += Py_GetPath();
     Py_SetPath(py_path.c_str());
 
