@@ -111,6 +111,6 @@ inline bool IsPlayer(Actor* ptr) {
 	return true;
 }
 inline bool IsPlayerInit(Actor* ptr) {
-	//ServerPlayer::isPlayerInitialized  !*((_BYTE *)this + 8208)
-	return !*((char*)ptr + 8208);
+	//ServerPlayer::isPlayerInitialized  !*((_BYTE *)this + 8216)
+	return !*((char*)ptr + 8216);
 }

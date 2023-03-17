@@ -24,8 +24,8 @@ struct PyEntity {
 	static Player* asPlayer(PyObject* self) {
 		Actor* entity = reinterpret_cast<PyEntity*>(self)->actor;
 		__try {
-		// Player::getPlatform
-			if (IsPlayer(entity) && *((char*)entity + 0x848))
+		// Player::getPlatform return *(unsigned int *)(a1 + 1728);
+			if (IsPlayer(entity) && *((char*)entity + 1728))
 				return reinterpret_cast<Player*>(reinterpret_cast<PyEntity*>(self)->actor);
 		}
 		__except (EXCEPTION_EXECUTE_HANDLER) {}
