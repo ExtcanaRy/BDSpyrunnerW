@@ -893,7 +893,7 @@ TMHOOK(onUseFrameBlock2, bool, "?attack@ItemFrameBlock@@UEBA_NPEAVPlayer@@AEBVBl
 }
 // player jump
 TMHOOK(onJump, void, "?jumpFromGround@Player@@UEAAXAEBVIConstBlockSource@@@Z",
-	Player* _this, const BlockSource a2) {
+	Player* _this, uintptr_t a2) {
 	EventCallBackHelper h(EventCode::onJump);
 	h.setArg(ToEntity(_this));
 	if (h.call())
