@@ -64,5 +64,5 @@ set_target_properties(BDSpyrunnerW PROPERTIES OUTPUT_NAME "BDSpyrunnerW")
 
 target_link_libraries(BDSpyrunnerW 
 	"${CMAKE_SOURCE_DIR}/lib/python39.lib"
-	"${CMAKE_SOURCE_DIR}/lib/minhook.x64d.lib"
+	"${CMAKE_SOURCE_DIR}/lib/minhook.x64.lib"
 )
