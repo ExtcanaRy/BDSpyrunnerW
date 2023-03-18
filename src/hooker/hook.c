@@ -13,13 +13,13 @@ bool hook_func(void *hook_func, void *detour_func, void *original_func)
 }
 
 //////////////////////////// SYM API /////////////////////////
-void *get_rva_func(unsigned int rva)
+inline void *rva2va(unsigned int rva)
 {
     uintptr_t base_addr = (uintptr_t)GetModuleHandle(NULL);
     return (void *)(base_addr + rva + 4096);
 }
 
-void split_rva_val_line(const char *line, const char *sym, unsigned int *rva_val)
+void split_sym_line(const char *line, const char *sym, unsigned int *rva_val)
 {
     char *split_str = malloc(strlen(line));
     strncpy(split_str, line, strlen(line));
@@ -41,11 +41,11 @@ void *dlsym(const char *sym)
         load_hashmap_from_file(SYM_CACHE_FILE);
         rva_val = get_rva_from_hashmap(sym);
         if (rva_val != -1)
-            return get_rva_func(rva_val);
+            return rva2va(rva_val);
     }
     else
     {
-        return get_rva_func(rva_val);
+        return rva2va(rva_val);
     }
     FILE *fp = fopen(SYM_FILE, "r");
     if (!fp)
@@ -55,7 +55,7 @@ void *dlsym(const char *sym)
 
         printf("Symbol file " SYM_FILE " not found, trying to generate.\n");
 
-        system(CVDUMP_EXE_PATH CVDUMP_EXEC_ARGS BDS_PDB_PATH " > " SYM_FILE );
+        gen_sym_file();
 
         fp = fopen(SYM_FILE, "r");
         if (!fp)
@@ -80,7 +80,7 @@ void *dlsym(const char *sym)
     {
         if (strstr(line, sym))
         {
-            split_rva_val_line(line, sym, &rva_val);
+            split_sym_line(line, sym, &rva_val);
             break;
         }
     }
@@ -91,7 +91,7 @@ void *dlsym(const char *sym)
     free(line);
     fclose(fp);
 
-    return get_rva_func(rva_val);
+    return rva2va(rva_val);
 }
 
 bool release_cvdump_exe(void)
@@ -109,6 +109,11 @@ bool release_cvdump_exe(void)
         printf("Release resource cvdump.exe failed.\n");
         return false;
     }
+}
+
+inline int gen_sym_file(void)
+{
+    return system(CVDUMP_EXE_PATH CVDUMP_EXEC_ARGS BDS_PDB_PATH " > " SYM_FILE );
 }
 
 //////////////////// MinHook ////////////////////

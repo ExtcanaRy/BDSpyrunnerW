@@ -40,7 +40,7 @@
     bool _INIT_HOOK_##name(_##name##_struct *name)          \
     {                                                       \
         void *func_ptr = atoi(rva_OR_sym)                   \
-                        ? get_rva_func(atoi(rva_OR_sym))    \
+                        ? rva2va(atoi(rva_OR_sym))          \
                         : dlsym(rva_OR_sym);                \
         _##name##_t _hook_##name =                          \
                         (_##name##_t)func_ptr;              \
@@ -83,7 +83,7 @@
 #define TMCALL(rva_OR_sym, func_proto, ...)                 \
     ((func_proto)                                           \
     (atoi(rva_OR_sym)                                       \
-        ? get_rva_func(atoi(rva_OR_sym))                    \
+        ? rva2va(atoi(rva_OR_sym))                          \
         : dlsym(rva_OR_sym)))                               \
     (__VA_ARGS__)
 
@@ -107,12 +107,11 @@
 extern "C" {
 #endif
 
-void save_sym_cache();
-void load_sym_cache();
 bool hook_func(void *hook_func, void *detour_func, void *original_func);
-void *get_rva_func(unsigned int rva);
+inline void *rva2va(unsigned int rva);
 void *dlsym(const char *sym);
 bool release_cvdump_exe(void);
+inline int gen_sym_file(void);
 
 bool hooker_init(void);
 bool hooker_uninit(void);
