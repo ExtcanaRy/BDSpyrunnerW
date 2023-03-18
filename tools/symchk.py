@@ -95,6 +95,8 @@ def read_pdb_symbols(file_path) -> list:
         for index, line in enumerate(lines):
             if "?" in line and "Z" in line:
                 pdb_symbols.append(line[43:-1])
+            elif "?" in line and "B" in line:
+                pdb_symbols.append(line[43:-1])
     printc(
         f"Loaded {len(pdb_symbols)} symbols from pdb file ({str(time.time()-start_time)[:5]})s!", Fore.GREEN)
     return pdb_symbols
@@ -104,6 +106,8 @@ def read_plugin_symbols(source_code_path) -> list:
     start_time = time.time()
     file_list = get_file_list(source_code_path)
     plugin_symbols = {}
+    str_begin = None
+    str_end = None
     for file_path in file_list:
         with open(file_path, "r", encoding=get_file_encoding(file_path)) as source_file:
             lines = (line for line in source_file)
@@ -114,8 +118,15 @@ def read_plugin_symbols(source_code_path) -> list:
                     str_begin = line.find(r'"?') + 1
                     str_end = line.find(r'Z"') + 1
                     # print(line[str_begin:str_end])
+                elif r'"?' in line and r'B"' in line:
+                    str_begin = line.find(r'"?') + 1
+                    str_end = line.find(r'B"') + 1
+                else:
+                    continue
+                if not re.search(r'[^a-zA-Z0-9@?_$]', line[str_begin:str_end]):
                     plugin_symbols[line[str_begin:str_end]
-                                   ] = f"{file_path}:{index+1}"
+                                    ] = f"{file_path}:{index+1}"
+                    
         if verbose_mode:
             print(f"Processed file: {file_path}")
     printc(
