@@ -11,6 +11,7 @@ struct Tag;
 struct Container;
 struct ScorePacketInfo;
 struct Abilities;
+struct AttributeInstance;
 enum class PlayerPermissionLevel : uint8_t {
 	Visitor,
 	Member,
@@ -47,11 +48,12 @@ struct Actor {
 	uintptr_t getUniqueID();
 	std::string getEntityTypeName();
 	uintptr_t updateAttrs();
-	uintptr_t getAttrs(void* a2);
-	float getCurrentValue(uintptr_t attr);
-	float getMaxValue(uintptr_t attr);
-	void setCurrentValue(uintptr_t attr, float value);
-	void setMaxValue(uintptr_t attr, float value);
+	AttributeInstance *getAttrs(void* a2);
+	AttributeInstance *getHealthAttr();
+	float getCurrentValue(AttributeInstance *attr);
+	float getMaxValue(AttributeInstance *attr);
+	void setCurrentValue(AttributeInstance *attr, float value);
+	void setMaxValue(AttributeInstance *attr, float value);
 	Level* getLevel();
 	uintptr_t addEffect(uintptr_t ef);
 	float getHealth();

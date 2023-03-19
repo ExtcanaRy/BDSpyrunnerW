@@ -85,23 +85,23 @@ uintptr_t Actor::updateAttrs() {
 	return SymCall<uintptr_t>("?_sendDirtyActorData@Actor@@QEAAXXZ", this);
 }
 
-uintptr_t Actor::getAttrs(void* a2) {
-	return SymCall<uintptr_t>("?getMutableAttribute@Actor@@UEAAPEAVAttributeInstance@@AEBVAttribute@@@Z", this, a2);
+AttributeInstance* Actor::getAttrs(void* a2) {
+	return SymCall<AttributeInstance*>("?getMutableAttribute@Actor@@UEAAPEAVAttributeInstance@@AEBVAttribute@@@Z", this, a2);
 }
 
-float Actor::getCurrentValue(uintptr_t attr) {
+float Actor::getCurrentValue(AttributeInstance *attr) {
 	return SymCall<float>("?getCurrentValue@AttributeInstance@@QEBAMXZ", attr);
 }
 
-float Actor::getMaxValue(uintptr_t attr) {
+float Actor::getMaxValue(AttributeInstance *attr) {
 	return SymCall<float>("?getMaxValue@AttributeInstance@@QEBAMXZ", attr);
 }
 
-void Actor::setCurrentValue(uintptr_t attr, float value) {
+void Actor::setCurrentValue(AttributeInstance *attr, float value) {
 	SymCall("?setCurrentValue@AttributeInstance@@QEAAXM@Z", attr, value);
 }
 
-void Actor::setMaxValue(uintptr_t attr, float value) {
+void Actor::setMaxValue(AttributeInstance *attr, float value) {
 	SymCall("?setMaxValue@AttributeInstance@@QEAAXM@Z", attr, value);
 }
 
@@ -115,24 +115,27 @@ uintptr_t Actor::addEffect(uintptr_t ef) {
 	return SymCall<uintptr_t>("?addEffect@Actor@@QEAAXAEBVMobEffectInstance@@@Z", this, ef);
 }
 
-// get current health
+AttributeInstance *Actor::getHealthAttr() {
+	return getAttrs(SYM("?HEALTH@SharedAttributes@@2VAttribute@@B"));
+}
+
 float Actor::getHealth() {
-	uintptr_t hattr = getAttrs(SYM("?HEALTH@SharedAttributes@@2VAttribute@@B"));
+	AttributeInstance *hattr = getHealthAttr();
 	return getCurrentValue(hattr);
 }
 
 float Actor::getMaxHealth() {
-	uintptr_t hattr = getAttrs(SYM("?HEALTH@SharedAttributes@@2VAttribute@@B"));
+	AttributeInstance *hattr = getHealthAttr();
 	return getMaxValue(hattr);
 }
 
 void Actor::setHealth(float value) {
-	uintptr_t hattr = getAttrs(SYM("?HEALTH@SharedAttributes@@2VAttribute@@B"));
+	AttributeInstance *hattr = getHealthAttr();
 	setCurrentValue(hattr, value);
 }
 
 void Actor::setMaxHealth(float value) {
-	uintptr_t hattr = getAttrs(SYM("?HEALTH@SharedAttributes@@2VAttribute@@B"));
+	AttributeInstance *hattr = getHealthAttr();
 	setMaxValue(hattr, value);
 }
 

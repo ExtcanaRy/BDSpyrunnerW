@@ -19,20 +19,16 @@ inline void *rva2va(unsigned int rva)
     return (void *)(base_addr + rva + 4096);
 }
 
-void split_sym_line(const char *line, const char *sym, unsigned int *rva_val)
+void split_sym_line(const char *line, unsigned short *type, unsigned int *rva_val)
 {
-    char *split_str = malloc(strlen(line));
-    strncpy(split_str, line, strlen(line));
-
-    char *rva_val_str = strtok(split_str, ":");
-    rva_val_str = strtok(NULL, ", ");
-    sscanf(rva_val_str, "[%*x:%x]", rva_val);
-    free(split_str);
+    *type = (unsigned short)strtol(line + 10, NULL, 16);
+    *rva_val = (unsigned int)strtol(line + 15, NULL, 16);
 }
 
 void *dlsym(const char *sym)
 {
     static bool is_sym_file_generated = false;
+    unsigned short rva_type = 0;
     unsigned int rva_val = 0;
 
     rva_val = get_rva_from_hashmap(sym);
@@ -80,7 +76,9 @@ void *dlsym(const char *sym)
     {
         if (strstr(line, sym))
         {
-            split_sym_line(line, sym, &rva_val);
+            split_sym_line(line, &rva_type, &rva_val);
+            if (rva_type == 3)
+                rva_val += 40718336;
             break;
         }
     }
