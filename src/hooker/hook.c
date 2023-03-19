@@ -16,7 +16,7 @@ bool hook_func(void *hook_func, void *detour_func, void *original_func)
 inline void *rva2va(unsigned int rva)
 {
     uintptr_t base_addr = (uintptr_t)GetModuleHandle(NULL);
-    return (void *)(base_addr + rva + 4096);
+    return (void *)(base_addr + rva);
 }
 
 void split_sym_line(const char *line, unsigned short *type, unsigned int *rva_val)
@@ -77,8 +77,10 @@ void *dlsym(const char *sym)
         if (strstr(line, sym))
         {
             split_sym_line(line, &rva_type, &rva_val);
-            if (rva_type == 3)
-                rva_val += 40718336;
+            if (rva_type == 1)
+                rva_val += 4096;
+            else if (rva_type == 3)
+                rva_val += 40722432;
             break;
         }
     }
