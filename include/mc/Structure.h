@@ -25,8 +25,8 @@ struct StructureDataLoadHelper {
 };
 #endif
 struct StructureTemplate {
-	char _this[216];
-	StructureTemplate(const span<char>& s);
+	char _this[240];
+	StructureTemplate(std::string_view);
 	~StructureTemplate();
 	Tag* save();
 	void load(Tag* t);

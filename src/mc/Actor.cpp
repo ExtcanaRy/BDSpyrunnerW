@@ -240,8 +240,8 @@ Container* Player::getArmorContainer() {
 }
 
 Container* Player::getEnderChestContainer() {
-	//IDA Player::Player Line751: v72 = (char *)this + 3792;
-	return Dereference<Container*>(this, 3792);
+	//IDA Player::Player Line776: v80 = (char *)this + 3800;
+	return Dereference<Container*>(this, 3800);
 }
 
 // Set armor
