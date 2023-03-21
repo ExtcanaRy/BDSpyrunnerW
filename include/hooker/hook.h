@@ -109,6 +109,7 @@ extern "C" {
 
 bool hook_func(void *hook_func, void *detour_func, void *original_func);
 inline void *rva2va(unsigned int rva);
+void read_static_data(long offset, void *data, size_t size);
 void *dlsym(const char *sym);
 bool release_cvdump_exe(void);
 inline int gen_sym_file(void);
