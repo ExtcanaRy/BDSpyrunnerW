@@ -21,3 +21,5 @@ struct RakNetGUID {
 	uint64_t unk;
 	short    unk8;
 };
+
+int getServerProtocolVersion();

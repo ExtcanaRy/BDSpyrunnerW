@@ -172,6 +172,10 @@ static PyObject* getBDSVersion(PyObject*, PyObject* args) {
 	return ToPyStr(version);
 }
 
+static PyObject* getServerProtocolVersion(PyObject*, PyObject* args) {
+	return PyLong_FromLong((long)getServerProtocolVersion());
+}
+
 static PyObject* logout(PyObject*, PyObject* args) {
 	const char* msg = "";
 	Py_PARSE("s", &msg);
@@ -481,6 +485,7 @@ static PyObject* setSignBlockMessage(PyObject*, PyObject* args) {
 static PyMethodDef Methods[]{
 	{ "minVersionRequire", minVersionRequire, METH_VARARGS, nullptr },
 	{ "getBDSVersion", getBDSVersion, METH_NOARGS, nullptr },
+	{ "getServerProtocolVersion", getServerProtocolVersion, METH_NOARGS, nullptr },
 	{ "logout", logout, METH_VARARGS, nullptr },
 	{ "runcmd", runCommand, METH_VARARGS, nullptr },
 	{ "setListener", setListener, METH_VARARGS, nullptr },

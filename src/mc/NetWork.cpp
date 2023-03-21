@@ -38,3 +38,10 @@ Player* ServerNetworkHandler::_getServerPlayer(uintptr_t id, uintptr_t pkt) {
 	return SymCall<Player*>("?_getServerPlayer@ServerNetworkHandler@@EEAAPEAVServerPlayer@@AEBVNetworkIdentifier@@W4SubClientId@@@Z",
 		v3, id, Dereference<char>(pkt, 16));
 }
+
+int getServerProtocolVersion() {
+	int protocol_version = 0;
+	int *offset = (int*)SYM("?NetworkProtocolVersion@SharedConstants@@3HB");
+	read_static_data((long)*offset, (void *)&protocol_version, sizeof(int));
+	return protocol_version;
+}
