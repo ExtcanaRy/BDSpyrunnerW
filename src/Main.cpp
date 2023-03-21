@@ -20,12 +20,14 @@ Logger logger("BDSpyrunnerW");
 
 bool load_plugin(void);
 bool init_hooks(void);
+void check_protocol_version(void);
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
     switch (ul_reason_for_call) {
     case DLL_PROCESS_ATTACH:
 		hooker_init();
+		check_protocol_version();
         load_plugin();
         break;
     case DLL_THREAD_ATTACH:
@@ -1015,6 +1017,24 @@ bool load_plugin(void)
     init_hooks();
 
     return true;
+}
+
+void check_protocol_version(void) {
+	int protocol_version = get_rva_from_hashmap("protocol_version");
+	int protocol_version_current = getServerProtocolVersion();
+	if (protocol_version == -1)
+	{
+		add_entry("protocol_version", (unsigned)protocol_version_current);
+		save_hashmap_to_file(SYM_CACHE_FILE);
+	}
+	else if (protocol_version != protocol_version_current)
+	{
+		remove(SYM_FILE);
+		remove(SYM_CACHE_FILE);
+		load_hashmap_from_file(SYM_CACHE_FILE);
+		add_entry("protocol_version", (unsigned)protocol_version_current);
+		save_hashmap_to_file(SYM_CACHE_FILE);
+	}
 }
 
 bool init_hooks(void)
