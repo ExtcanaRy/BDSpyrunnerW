@@ -20,6 +20,7 @@
             CVDUMP_EXE_PATH " not found, please download it from " CVDUMP_URL \
             " and then put it in the same level folder as bedrock_server.pdb\n"
 
+#define BDS_EXE_PATH "bedrock_server.exe"
 #define BDS_PDB_PATH "bedrock_server.pdb"
 
 #define TMHOOK(name, ret_type, rva_OR_sym, ...)             \
@@ -113,6 +114,7 @@ void read_static_data(long offset, void *data, size_t size);
 void *dlsym(const char *sym);
 bool release_cvdump_exe(void);
 inline int gen_sym_file(void);
+bool init_section_infos(void);
 
 bool hooker_init(void);
 bool hooker_uninit(void);

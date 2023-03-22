@@ -1,12 +1,32 @@
 #include <hooker/hook.h>
 
-enum SECTION_TYPE
+enum section_type
 {
-    NONE,
-    TEXT,
-    RDATA,
-    DATA,
+    SECTION_TEXT,
+    SECTION_RDATA,
+    SECTION_DATA,
+    SECTION_PDATA,
+    SECTION__RDATA,
+    SECTION_RSRC,
+    SECTION_RELOC,
 };
+
+typedef enum {
+    VIRTUAL_ADDRESS,
+    MISC_VIRTUAL_SIZE,
+    SIZE_OF_RAW_DATA,
+    POINTER_TO_RAW_DATA,
+    CHARACTERISTICS,
+} section_property;
+
+struct section_info
+{
+    DWORD virtual_address;
+    DWORD misc_virtual_size;
+    DWORD size_of_raw_data;
+    DWORD pointer_to_raw_data;
+    DWORD characteristics;
+} section_infos[7];
 
 //////////////////////////// HOOK API /////////////////////////
 bool hook_func(void *hook_func, void *detour_func, void *original_func)
@@ -33,7 +53,7 @@ void split_sym_line(const char *line, unsigned short *type, unsigned int *rva_va
 }
 
 void read_static_data(long offset, void *data, size_t size) {
-    FILE *fp = fopen("bedrock_server.exe", "rb");
+    FILE *fp = fopen(BDS_EXE_PATH, "rb");
     if (!fp)
         return;
     fseek(fp, offset, SEEK_SET);
@@ -45,7 +65,8 @@ void *dlsym(const char *sym)
 {
     static bool is_sym_file_generated = false;
     unsigned short rva_type = 0;
-    static unsigned int rva_val = 0;
+    static long rva_val = 0;
+
 
     rva_val = get_rva_from_hashmap(sym);
     if (rva_val == -1)
@@ -82,7 +103,7 @@ void *dlsym(const char *sym)
         }
     }
 
-    const size_t MAX_LINE_LENGTH = 4096;
+    const size_t MAX_LINE_LENGTH = 8192;
     char *line = (char*)malloc(MAX_LINE_LENGTH);
 
     if (!line)
@@ -93,19 +114,19 @@ void *dlsym(const char *sym)
         if (strstr(line, sym))
         {
             split_sym_line(line, &rva_type, &rva_val);
-            switch (rva_type)
+            switch (rva_type - 1)
             {
-            case TEXT:
-                rva_val += 0x1000;
+            case SECTION_TEXT:
+                rva_val += section_infos[SECTION_TEXT].virtual_address;
                 break;
-            case RDATA:
+            case SECTION_RDATA:
                 free(line);
                 fclose(fp);
-                rva_val += 0x206d400;   // Temporarily requires manual maintenance
+                rva_val += section_infos[SECTION_RDATA].pointer_to_raw_data;
                 return (void *)&rva_val;
                 break;
-            case DATA:
-                rva_val += 0x26d6000;
+            case SECTION_DATA:
+                rva_val += section_infos[SECTION_DATA].virtual_address;
                 break;
             }
             break;
@@ -143,11 +164,76 @@ inline int gen_sym_file(void)
     return system(CVDUMP_EXE_PATH CVDUMP_EXEC_ARGS BDS_PDB_PATH " > " SYM_FILE );
 }
 
+//////////////////// SECTION ////////////////////
+bool init_section_infos(void)
+{
+    IMAGE_DOS_HEADER dos_header;
+    IMAGE_NT_HEADERS64 nt_header;
+    IMAGE_SECTION_HEADER section_header;
+
+    HANDLE h_file = CreateFileA(BDS_EXE_PATH, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+    if (h_file == INVALID_HANDLE_VALUE)
+    {
+        printf("Error: cannot open file %s.\n", BDS_EXE_PATH);
+        return false;
+    }
+
+    DWORD bytes_read = 0;
+    if (!ReadFile(h_file, &dos_header, sizeof(dos_header), &bytes_read, NULL))
+    {
+        printf("Error: cannot read DOS header.\n");
+        CloseHandle(h_file);
+        return false;
+    }
+
+    if (SetFilePointer(h_file, dos_header.e_lfanew, NULL, FILE_BEGIN) == INVALID_SET_FILE_POINTER)
+    {
+        printf("Error: cannot locate NT header.\n");
+        CloseHandle(h_file);
+        return false;
+    }
+    if (!ReadFile(h_file, &nt_header, sizeof(nt_header), &bytes_read, NULL))
+    {
+        printf("Error: cannot read NT header.\n");
+        CloseHandle(h_file);
+        return false;
+    }
+
+    DWORD sectionHeaderOffset = dos_header.e_lfanew + sizeof(nt_header.Signature) + sizeof(nt_header.FileHeader) + nt_header.FileHeader.SizeOfOptionalHeader;
+    if (SetFilePointer(h_file, sectionHeaderOffset, NULL, FILE_BEGIN) == INVALID_SET_FILE_POINTER)
+    {
+        printf("Error: cannot locate section header.\n");
+        CloseHandle(h_file);
+        return false;
+    }
+
+    for (int i = 0; i < nt_header.FileHeader.NumberOfSections; i++)
+    {
+        if (!ReadFile(h_file, &section_header, sizeof(section_header), &bytes_read, NULL))
+        {
+            printf("Error: cannot read section header.\n");
+            CloseHandle(h_file);
+            return false;
+        }
+
+        section_infos[i].virtual_address     = section_header.VirtualAddress;
+        section_infos[i].misc_virtual_size   = section_header.Misc.VirtualSize;
+        section_infos[i].size_of_raw_data    = section_header.SizeOfRawData;
+        section_infos[i].pointer_to_raw_data = section_header.PointerToRawData;
+        section_infos[i].characteristics     = section_header.Characteristics;
+    }
+
+    CloseHandle(h_file);
+    return true;
+}
+
 //////////////////// MinHook ////////////////////
 
 bool hooker_init(void)
 {
     load_hashmap_from_file(SYM_CACHE_FILE);
+    if (!init_section_infos())
+        return false;
     if (MH_Initialize() != MH_OK)
         return false;
         
