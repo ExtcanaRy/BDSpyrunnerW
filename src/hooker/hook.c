@@ -117,7 +117,6 @@ void read_static_data(long offset, void *data, size_t size)
 
 void *dlsym(const char *sym)
 {
-    static bool is_sym_file_generated = false;
     unsigned short rva_type = 0;
     static long rva_val = 0;
 
@@ -130,28 +129,15 @@ void *dlsym(const char *sym)
     } else {
         return rva2va(rva_val);
     }
+
     FILE *fp = fopen(SYM_FILE, "r");
     if (!fp) {
-        if (!release_cvdump_exe())
-            return NULL;
-
-        printf("Symbol file " SYM_FILE " not found, trying to generate.\n");
-
-        gen_sym_file();
-
-        fp = fopen(SYM_FILE, "r");
-        if (!fp) {
-            if (!is_sym_file_generated) {
-                printf("Failed to generate. \n");
-                is_sym_file_generated = true;
-            }
-            printf("The symbol %s will not be parsed. \n", sym);
-            return NULL;
-        }
+        printf("The symbol %s will not be parsed. \n", sym);
+        return NULL;
     }
 
     const size_t MAX_LINE_LENGTH = 8192;
-    char *line = (char*)malloc(MAX_LINE_LENGTH);
+    char *line = (char *)malloc(MAX_LINE_LENGTH);
 
     if (!line)
         return NULL;
@@ -167,7 +153,7 @@ void *dlsym(const char *sym)
                 free(line);
                 fclose(fp);
                 rva_val += section_infos[SECTION_RDATA].pointer_to_raw_data;
-                return (void *)&rva_val;
+                return (void *) &rva_val;
                 break;
             case SECTION_DATA:
                 rva_val += section_infos[SECTION_DATA].virtual_address;
@@ -202,10 +188,49 @@ bool release_cvdump_exe(void)
 
 inline int gen_sym_file(void)
 {
-    return system(CVDUMP_EXE_PATH CVDUMP_EXEC_ARGS BDS_PDB_PATH " > " SYM_FILE );
+    if (!release_cvdump_exe())
+        return -1;
+    printf("Symbol file is being generated...\n");
+    int ret_code = system(CVDUMP_EXE_PATH CVDUMP_EXEC_ARGS BDS_PDB_PATH " > " SYM_FILE );
+    remove(CVDUMP_EXE_PATH);
+    return ret_code;
 }
 
-//////////////////// MinHook ////////////////////
+inline int re_gen_sym_files(void)
+{
+    remove(SYM_FILE);
+    remove(SYM_CACHE_FILE);
+    free_hashmap();
+    save_hashmap_to_file(SYM_FILE);
+    return gen_sym_file();
+}
+
+//////////////////// Protocol ///////////////////
+int get_network_protocol_version(void)
+{
+	int protocol_version = 0;
+	int *offset = (int *)dlsym("?NetworkProtocolVersion@SharedConstants@@3HB");
+	read_static_data((long) *offset, (void *) &protocol_version, sizeof(int));
+	return protocol_version;
+}
+
+//////////////////// Auto Update ////////////////
+void check_server_update(void)
+{
+	unsigned long section_text_size = get_rva_from_hashmap("section_text_size");
+    unsigned long section_text_size_current = section_infos[SECTION_TEXT].size_of_raw_data;
+
+    if (section_text_size != section_text_size_current) {
+        if (section_text_size != -1)
+            printf("Server version change detected. Symbol file is being regenerated.\n");
+
+        re_gen_sym_files();
+		add_entry("section_text_size", section_text_size_current);
+		save_hashmap_to_file(SYM_CACHE_FILE);
+	}
+}
+
+//////////////////// Hooker ////////////////////
 bool hooker_init(void)
 {
     load_hashmap_from_file(SYM_CACHE_FILE);
@@ -213,6 +238,7 @@ bool hooker_init(void)
         return false;
     if (MH_Initialize() != MH_OK)
         return false;
+    check_server_update();
         
     return true;
 }

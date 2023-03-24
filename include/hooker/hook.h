@@ -114,7 +114,13 @@ void read_static_data(long offset, void *data, size_t size);
 void *dlsym(const char *sym);
 bool release_cvdump_exe(void);
 inline int gen_sym_file(void);
+inline int re_gen_sym_files(void);
+
 bool init_section_infos(void);
+
+int get_network_protocol_version(void);
+
+void check_server_update(void);
 
 bool hooker_init(void);
 bool hooker_uninit(void);

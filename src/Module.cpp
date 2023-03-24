@@ -173,7 +173,7 @@ static PyObject* getBDSVersion(PyObject*, PyObject* args) {
 }
 
 static PyObject* getServerProtocolVersion(PyObject*, PyObject* args) {
-	return PyLong_FromLong((long)getServerProtocolVersion());
+	return PyLong_FromLong((long)get_network_protocol_version());
 }
 
 static PyObject* logout(PyObject*, PyObject* args) {
