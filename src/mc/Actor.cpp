@@ -413,6 +413,17 @@ void Player::sendSetScorePacket(char type, const vector<ScorePacketInfo>& slot) 
 	sendNetworkPacket(pkt);
 }
 
+void Player::sendPlaySoundPacket(const std::string& soundName, Vec3 pos, float volume, float pitch) {
+	uintptr_t pkt = createPacket(86);
+	Dereference<std::string>(pkt, 48) = soundName;
+	Dereference<int>(pkt, 80) = int(pos.x * 8.0);
+	Dereference<int>(pkt, 84) = int(pos.y * 8.0);
+	Dereference<int>(pkt, 88) = int(pos.z * 8.0);
+	Dereference<float>(pkt, 92) = volume;
+	Dereference<float>(pkt, 96) = pitch;
+	sendNetworkPacket(pkt);
+}
+
 // May not close the GUI, but will definitely close the container, after closing the player can not operate the container
 void Player::doDeleteContainerManager() {
 	SymCall("?doDeleteContainerManager@ServerPlayer@@QEAAX_N@Z",

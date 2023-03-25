@@ -380,6 +380,20 @@ PyObject* PyEntity_SendCommandPacket(PyObject* self, PyObject* args) {
 	Py_RETURN_NONE;
 }
 
+PyObject* PyEntity_SendPlaySoundPacket(PyObject* self, PyObject* args) {
+	const char* soundName;
+	Vec3 pos;
+	float volume = 1.0;
+	float pitch = 1.0;
+	if (PyArg_ParseTuple(args, "sfff|ff:sendPlaySoundPacket", &soundName, &pos.x, &pos.y, &pos.z, &volume, &pitch)) {
+		Player* p = PyEntity::asPlayer(self);
+		if (!p)
+			return nullptr;
+		p->sendPlaySoundPacket(soundName, pos, volume, pitch);
+	}
+	Py_RETURN_NONE;
+}
+
 PyObject* PyEntity_ResendAllChunks(PyObject* self, PyObject*) {
 	Player* p = PyEntity::asPlayer(self);
 	if (!p)
@@ -635,6 +649,7 @@ PyMethodDef PyEntity_Methods[]{
 	{"teleport", PyEntity_Teleport, METH_VARARGS, nullptr},
 	{"sendTextPacket", PyEntity_SendTextPacket, METH_VARARGS, nullptr},
 	{"sendCommandPacket", PyEntity_SendCommandPacket, METH_VARARGS, nullptr},
+	{"sendPlaySoundPacket", PyEntity_SendPlaySoundPacket, METH_VARARGS, nullptr},
 	{"resendAllChunks", PyEntity_ResendAllChunks, METH_NOARGS, nullptr},
 	{"disconnect", PyEntity_Disconnect, METH_VARARGS, nullptr},
 	{"getScore", PyEntity_GetScore, METH_VARARGS, nullptr},

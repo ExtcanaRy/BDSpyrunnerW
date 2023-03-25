@@ -104,6 +104,7 @@ struct Player : Mob {
 	void sendBossEventCodePacket(std::string name, float per, int eventtype);
 	void sendsetDisplayObjectivePacket(const std::string& title, const std::string& name = "name");
 	void sendSetScorePacket(char type, const std::vector<ScorePacketInfo>& slot);
+	void sendPlaySoundPacket(const std::string& soundName, Vec3 position, float volume = 1.0, float pitch = 1.0);
 };
 inline bool IsPlayer(Actor* ptr) {
 	if (ptr == nullptr)
