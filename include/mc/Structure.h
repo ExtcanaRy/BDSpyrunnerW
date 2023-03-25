@@ -7,7 +7,7 @@ struct Tag;
 struct BlockSource;
 struct BlockPalette;
 struct StructureSettings {
-	char _this[96];
+	char _this[104];
 	StructureSettings(BlockPos* size, bool IgnoreEntities, bool IgnoreBlocks);
 	~StructureSettings();
 };
