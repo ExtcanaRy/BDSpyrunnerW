@@ -415,12 +415,14 @@ void Player::sendSetScorePacket(char type, const vector<ScorePacketInfo>& slot) 
 
 void Player::sendPlaySoundPacket(const std::string& soundName, Vec3 pos, float volume, float pitch) {
 	uintptr_t pkt = createPacket(86);
-	Dereference<std::string>(pkt, 48) = soundName;
-	Dereference<int>(pkt, 80) = int(pos.x * 8.0);
-	Dereference<int>(pkt, 84) = int(pos.y * 8.0);
-	Dereference<int>(pkt, 88) = int(pos.z * 8.0);
-	Dereference<float>(pkt, 92) = volume;
-	Dereference<float>(pkt, 96) = pitch;
+	SymCall<uintptr_t>("??0PlaySoundPacket@@QEAA@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@AEBVVec3@@MM@Z",
+		pkt, &soundName, &pos, volume, pitch);
+	// Dereference<std::string>(pkt, 48) = soundName;
+	// Dereference<int>(pkt, 80) = int(pos.x * 8.0);
+	// Dereference<int>(pkt, 84) = int(pos.y * 8.0);
+	// Dereference<int>(pkt, 88) = int(pos.z * 8.0);
+	// Dereference<float>(pkt, 92) = volume;
+	// Dereference<float>(pkt, 96) = pitch;
 	sendNetworkPacket(pkt);
 }
 
