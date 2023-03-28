@@ -1008,6 +1008,18 @@ TMHOOK(onChatPkt, uintptr_t,
 
 	return onChatPkt.original(a1, &name_mod, &msg_mod, xuid, a4);
 }
+
+TMHOOK(onTick, void,
+	"?tick@Level@@UEAAXXZ",
+	Level *level)
+{
+	EventCallBackHelper h(EventCode::onTick);
+
+	h.insert("null", "");
+	h.call();
+
+	return onTick.original(level);
+}
 #pragma endregion
 
 
@@ -1081,6 +1093,7 @@ bool init_hooks(void)
 	onUseSignBlock.init(&onUseSignBlock);
 	onLiquidSpread.init(&onLiquidSpread);
 	onChatPkt.init(&onChatPkt);
+	onTick.init(&onTick);
 
 	hooker_enable_all_hook();
 
