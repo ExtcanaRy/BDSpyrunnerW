@@ -978,13 +978,15 @@ TMHOOK(onLiquidSpread, bool,
 		.insert("src_name", src_name)
 		.insert("src_pos", src_pos)
 		.insert("dst_name", dst_name)
-		.insert("dst_pos", dst_pos);
+		.insert("dst_pos", dst_pos)
+		.insert("dimensionid", a2->getDimensionId());
 
 	if (!h.call())
 		return false;
-	
+
 	return onLiquidSpread.original(_this, a2, dst_pos, src_pos, a5);
 }
+
 TMHOOK(onChatPkt, uintptr_t, 
 	"?createChat@TextPacket@@SA?AV1@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@000@Z",
 	uintptr_t a1, std::string *name, std::string *msg, std::string *xuid, std::string &a4)
@@ -993,7 +995,7 @@ TMHOOK(onChatPkt, uintptr_t,
 
 	const char *name_c_str = name->c_str();
 	const char *msg_c_str = msg->c_str();
-	
+
 	EventCallBackHelper h(EventCode::onChatPkt);
 	h
 		.insert("player", player)
