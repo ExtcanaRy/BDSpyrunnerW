@@ -1,8 +1,9 @@
 #pragma once
 #pragma execution_character_set("utf-8")
 #pragma warning(disable:4996)
+#pragma comment(lib, "littlehooker.lib")
 #include <iostream>
-#include <hooker/hook.h>
+#include <littlehooker/littlehooker.h>
 #include "Level.h"
 #include "NetWork.h"
 
