@@ -476,8 +476,8 @@ static PyObject* setSignBlockMessage(PyObject*, PyObject* args) {
 	if (bs == nullptr)
 		Py_RETURN_ERROR("Unknown dimension ID");
 	BlockActor* sign = bs->getBlockEntity(&bp);
-	SymCall<void, BlockActor*, const string&, const string&>("?setMessage@SignBlockActor@@QEAAXV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@0@Z",
-		sign, name, name);
+	SymCall<void, BlockActor*, const string&>("?setMessage@Text@SignBlockActor@@QEAAXV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z",
+		sign, name);
 	sign->setChanged();
 	Py_RETURN_NONE;
 }
