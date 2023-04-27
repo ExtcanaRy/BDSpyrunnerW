@@ -240,8 +240,8 @@ Container* Player::getArmorContainer() {
 }
 
 Container* Player::getEnderChestContainer() {
-	//IDA Player::Player Line776: v80 = (char *)this + 3800;
-	return Dereference<Container*>(this, 3800);
+	//IDA Player::Player Line861: v96 = (char *)this + 3264;
+	return Dereference<Container*>(this, 3264);
 }
 
 // Set armor
@@ -295,12 +295,17 @@ PlayerPermissionLevel Player::getPlayerPermissionLevel() {
 }
 
 void Player::setPermissions(PlayerPermissionLevel m) {
-	_Big_uint128 v93[8];
+	_Big_uint128 pkt[8];
 	SymCall("?setPermissions@Player@@QEAAXW4CommandPermissionLevel@@@Z",
 		this, m);
-	memset(v93, 0, sizeof(v93));
 	SymCall<uintptr_t>("??0UpdateAbilitiesPacket@@QEAA@UActorUniqueID@@AEBVLayeredAbilities@@@Z",
-		v93, Actor::getUniqueID(), this + 2508);
+		pkt, *(uintptr_t*)Actor::getUniqueID(), getAbilities());
+	sendNetworkPacket((uintptr_t)pkt);
+}
+
+Abilities* Player::getAbilities() {
+	return SymCall<Abilities*>("?getAbilities@Player@@QEBAAEBVLayeredAbilities@@XZ",
+		this);
 }
 
 //获取设备id
