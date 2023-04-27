@@ -323,7 +323,7 @@ TLHOOK(filterInventoryTransaction, void, "?handle@ServerNetworkHandler@@UEAAXAEB
 
 // use item
 TLHOOK(onUseItem, bool, "?useItemOn@GameMode@@UEAA?AVInteractionResult@@AEAVItemStack@@AEBVBlockPos@@EAEBVVec3@@PEBVBlock@@@Z",
-	uintptr_t _this, ItemStack* item, BlockPos* bp, int* a4, char a5, uintptr_t a6, Block* b) {
+	uintptr_t _this, DWORD* interactionResult, ItemStack* item, BlockPos* bp, char a5, uintptr_t a6, Block* b) {
 	EventCallBackHelper h(EventCode::onUseItem);
 	Player* p = Dereference<Player*>(_this, 8);
 	BlockLegacy* bl = b->getBlockLegacy();
@@ -337,7 +337,7 @@ TLHOOK(onUseItem, bool, "?useItemOn@GameMode@@UEAA?AVInteractionResult@@AEAVItem
 		.insert("blockid", bl->getBlockItemID())
 		.insert("position", bp);
 	if (h.call())
-		return onUseItem.original(_this, item, bp, a4, a5, a6, b);
+		return onUseItem.original(_this, interactionResult, item, bp, a5, a6, b);
 	return false;
 }
 // before(try) use item
