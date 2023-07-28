@@ -29,13 +29,6 @@ unsigned Level::getSeed() {
 	return SymCall<unsigned>("?getSeed@Level@@UEAAIXZ", this);
 }
 
-string Level::getPlayerNames() {
-	string s;
-	SymCall<string&>("?getPlayerNames@Level@@UEAA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ",
-		this, &s);
-	return s;
-}
-
 Actor* Level::fetchEntity(uintptr_t id) {
 	return SymCall<Actor*>("?fetchEntity@Level@@UEBAPEAVActor@@UActorUniqueID@@_N@Z",
 		this, id, false);

@@ -12,7 +12,7 @@ void serialize<CompoundTag>::write(const CompoundTag* item, BinaryStream* stream
 
 CompoundTag* serialize<CompoundTag>::read(ReadOnlyBinaryStream* stream) {
 	CompoundTag* tag = newTag(TagType::Compound);
-	SymCall("?read@?$serialize@VCompoundTag@@@@SA?AVCompoundTag@@AEAVReadOnlyBinaryStream@@@Z",
+	SymCall("?read@?$serialize@VCompoundTag@@@@SA?AV?$Result@VCompoundTag@@Verror_code@std@@@Bedrock@@AEAVReadOnlyBinaryStream@@@Z",
 		tag, stream);
 	return tag;
 }

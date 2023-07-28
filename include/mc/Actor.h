@@ -45,7 +45,7 @@ struct Actor {
 	BlockSource* getRegion();
 	ItemStack* getArmor(int slot);
 	unsigned getEntityTypeId();
-	uintptr_t getUniqueID();
+	uintptr_t getOrCreateUniqueID();
 	std::string getEntityTypeName();
 	uintptr_t updateAttrs();
 	AttributeInstance *getAttrs(void* a2);
@@ -115,5 +115,5 @@ inline bool IsPlayer(Actor* ptr) {
 }
 inline bool IsPlayerInit(Actor* ptr) {
 	//ServerPlayer::isPlayerInitialized  !*((_BYTE *)this + 7680)
-	return !*((char*)ptr + 7680);
+	return !*((char*)ptr + 7552);
 }

@@ -69,8 +69,8 @@ unsigned Actor::getEntityTypeId() {
 	return SymCall<unsigned>("?getEntityTypeId@Actor@@UEBA?AW4ActorType@@XZ", this);
 }
 
-uintptr_t Actor::getUniqueID() {
-	return SymCall<uintptr_t>("?getUniqueID@Actor@@QEBAAEBUActorUniqueID@@XZ", this);
+uintptr_t Actor::getOrCreateUniqueID() {
+	return SymCall<uintptr_t>("?getOrCreateUniqueID@Actor@@QEBAAEBUActorUniqueID@@XZ", this);
 }
 
 string Actor::getEntityTypeName() {
@@ -204,7 +204,7 @@ string Player::getUuid() {//IDA ServerNetworkHandler::_createNewPlayer 222
 	string p;
 	void* v33 = **(void***)(this + 8);
 	int v107 = *(int*)(this + 16);
-	void* v34 = SymCall<void*>("??$try_get@VUserEntityIdentifierComponent@@@?$basic_registry@VEntityId@@V?$allocator@VEntityId@@@std@@@entt@@QEBA?A_PVEntityId@@@Z", v33, &v107);
+	void* v34 = SymCall<void*>("??$try_get@VUserEntityIdentifierComponent@@@?$basic_registry@VEntityId@@V?$allocator@VEntityId@@@std@@@entt@@QEAA?A_PVEntityId@@@Z", v33, &v107);
 	SymCall<string&>("?asString@UUID@mce@@QEBA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ",
 		uintptr_t(v34) + 168, &p);
 	return p;
@@ -299,7 +299,7 @@ void Player::setPermissions(PlayerPermissionLevel m) {
 	SymCall("?setPermissions@Player@@QEAAXW4CommandPermissionLevel@@@Z",
 		this, m);
 	SymCall<uintptr_t>("??0UpdateAbilitiesPacket@@QEAA@UActorUniqueID@@AEBVLayeredAbilities@@@Z",
-		pkt, *(uintptr_t*)Actor::getUniqueID(), getAbilities());
+		pkt, *(uintptr_t*)Actor::getOrCreateUniqueID(), getAbilities());
 	sendNetworkPacket((uintptr_t)pkt);
 }
 
@@ -393,8 +393,8 @@ void Player::sendCommandRequestPacket(const string& cmd) {
 
 void Player::sendBossEventCodePacket(string name, float per, int eventtype) {
 	uintptr_t pkt = createPacket(74);
-	Dereference<uintptr_t>(pkt, 56) = Dereference<uintptr_t>(getUniqueID());
-	//Dereference<uintptr_t, pkt + 64) = Dereference<uintptr_t, getUniqueID());
+	Dereference<uintptr_t>(pkt, 56) = Dereference<uintptr_t>(getOrCreateUniqueID());
+	//Dereference<uintptr_t, pkt + 64) = Dereference<uintptr_t, getOrCreateUniqueID());
 	Dereference<int>(pkt, 72) = eventtype;//0显示,1更新,2隐藏,
 	Dereference<string>(pkt, 80) = name;
 	Dereference<float>(pkt, 112) = per;

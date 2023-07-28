@@ -31,7 +31,6 @@ struct Level {
 	void forEachPlayer(const std::function<bool(Player*)>&);
 	Scoreboard* getScoreBoard();
 	unsigned getSeed();
-	std::string getPlayerNames();
 	Actor* fetchEntity(uintptr_t id);
 	Player* getPlayerByXuid(const std::string& xuid);
 	BlockPalette* getBlockPalette();
