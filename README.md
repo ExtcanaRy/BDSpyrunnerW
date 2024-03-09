@@ -17,7 +17,7 @@
 
 ## 文档
 
-* [这里](https://pyr.jfishing.love/zh_Hans/)
+* [这里](https://extcanary.github.io/PYRW-Docs/zh_Hans/)
 
 ## 联系我们
 

@@ -17,7 +17,7 @@ It greatly reduces the threshold for plug-in development and effectively simplif
 
 ## Documents
 
-* [Here](https://pyr.jfishing.love/en/)
+* [Here](https://extcanary.github.io/PYRW-Docs/en/)
 
 ## Contact us
 
