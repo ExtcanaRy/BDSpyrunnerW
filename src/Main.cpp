@@ -129,7 +129,7 @@ TLHOOK(DedicatedServer_start, int, "?start@DedicatedServer@@QEAA?AW4StartResult@
 	return DedicatedServer_start.original(a1, a2);
 }
 // Constructor for Level		
-TLHOOK(Level_construct, Level*, "??0Level@@QEAA@AEBV?$not_null@V?$NonOwnerPointer@VSoundPlayerInterface@@@Bedrock@@@gsl@@V?$OwnerPtrT@U?$SharePtrRefTraits@VLevelStorage@@@@@@AEAVIMinecraftEventing@@_NW4SubClientId@@AEAVScheduler@@V?$not_null@V?$NonOwnerPointer@VStructureManager@@@Bedrock@@@2@AEAVResourcePackManager@@AEBV?$not_null@V?$NonOwnerPointer@VIEntityRegistryOwner@@@Bedrock@@@2@V?$WeakRefT@UEntityRefTraits@@@@V?$unique_ptr@VBlockComponentFactory@@U?$default_delete@VBlockComponentFactory@@@std@@@std@@V?$unique_ptr@VBlockDefinitionGroup@@U?$default_delete@VBlockDefinitionGroup@@@std@@@std@@VItemRegistryRef@@V?$weak_ptr@VBlockTypeRegistry@@@std@@33AEBUNetworkPermissions@@V?$optional@VDimensionDefinitionGroup@@@std@@@Z",
+TLHOOK(Level_construct, Level*, "??0Level@@QEAA@AEBV?$not_null@V?$NonOwnerPointer@VSoundPlayerInterface@@@Bedrock@@@gsl@@V?$OwnerPtr@VLevelStorage@@@@AEAVIMinecraftEventing@@_NW4SubClientId@@AEAVScheduler@@V?$not_null@V?$NonOwnerPointer@VStructureManager@@@Bedrock@@@2@AEAVResourcePackManager@@AEBV?$not_null@V?$NonOwnerPointer@VIEntityRegistryOwner@@@Bedrock@@@2@V?$WeakRef@VEntityContext@@@@V?$unique_ptr@VBlockComponentFactory@@U?$default_delete@VBlockComponentFactory@@@std@@@std@@V?$unique_ptr@VBlockDefinitionGroup@@U?$default_delete@VBlockDefinitionGroup@@@std@@@std@@VItemRegistryRef@@V?$weak_ptr@VBlockTypeRegistry@@@std@@33AEBUNetworkPermissions@@V?$optional@VDimensionDefinitionGroup@@@std@@@Z",
 	Level* _this, uintptr_t a1, uintptr_t a2, uintptr_t a3, uintptr_t a4, uintptr_t a5, uintptr_t a6, uintptr_t a7, uintptr_t a8, uintptr_t a9, uintptr_t a10, uintptr_t a11, uintptr_t a12, uintptr_t a13, uintptr_t a14, uintptr_t a15, uintptr_t a16, uintptr_t a17, uintptr_t a18, uintptr_t a19) {
 	return global<Level> = Level_construct.original(_this, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17, a18, a19);
 }
@@ -149,7 +149,7 @@ TLHOOK(RakPeer_construct, RakPeer*, "??0RakPeer@RakNet@@QEAA@XZ",
 	return RakPeer_construct.original(_this);
 }
 // Constructor for ServerNetworkHandler
-TLHOOK(ServerNetworkHandler_construct, uintptr_t, "??0ServerNetworkHandler@@QEAA@AEAVGameCallbacks@@AEBV?$NonOwnerPointer@VILevel@@@Bedrock@@AEAVNetworkSystem@@AEAVPrivateKeyManager@@AEAVServerLocator@@AEAVPacketSender@@AEAVAllowList@@PEAVPermissionsFile@@AEBVUUID@mce@@H_NAEBV?$vector@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@V?$allocator@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@2@@std@@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@HAEAVMinecraftCommands@@AEAVIMinecraftApp@@AEBV?$unordered_map@UPackIdVersion@@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@U?$hash@UPackIdVersion@@@3@U?$equal_to@UPackIdVersion@@@3@V?$allocator@U?$pair@$$CBUPackIdVersion@@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@std@@@3@@std@@AEAVScheduler@@V?$NonOwnerPointer@VTextFilteringProcessor@@@3@V?$optional_ref@VMinecraftGameTest@@@@V?$ServiceReference@VAppConfigs@@@@V?$ServiceReference@VMultiplayerServiceManager@Social@@@@9AEBUNetworkPermissions@@@Z",
+TLHOOK(ServerNetworkHandler_construct, uintptr_t, "??0ServerNetworkHandler@@QEAA@AEAVGameCallbacks@@AEBV?$NonOwnerPointer@VILevel@@@Bedrock@@AEAVServerNetworkSystem@@AEAVPrivateKeyManager@@AEAVServerLocator@@AEAVPacketSender@@AEAVAllowList@@PEAVPermissionsFile@@AEBVUUID@mce@@HAEBV?$vector@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@V?$allocator@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@2@@std@@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@HAEAVMinecraftCommands@@AEAVIMinecraftApp@@AEBV?$unordered_map@UPackIdVersion@@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@U?$hash@UPackIdVersion@@@3@U?$equal_to@UPackIdVersion@@@3@V?$allocator@U?$pair@$$CBUPackIdVersion@@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@std@@@3@@std@@AEAVScheduler@@V?$NonOwnerPointer@VTextFilteringProcessor@@@3@V?$optional_ref@VMinecraftGameTest@@@@V?$ServiceReference@VAppConfigs@@@@V?$ServiceReference@VMultiplayerServiceManager@Social@@@@AEBUNetworkPermissions@@AEBUHandlerToggles@0@@Z",
 	ServerNetworkHandler* _this, uintptr_t a1, uintptr_t a2, uintptr_t a3, uintptr_t a4, uintptr_t a5, uintptr_t a6, uintptr_t a7, uintptr_t a8, uintptr_t a9, uintptr_t a10, uintptr_t a11, uintptr_t a12, uintptr_t a13, uintptr_t a14, uintptr_t a15, uintptr_t a16, uintptr_t a17, uintptr_t a18, uintptr_t a19, uintptr_t a20, uintptr_t a21, uintptr_t a22, uintptr_t a23, uintptr_t a24) {
 	global<ServerNetworkHandler> = _this;
 	return ServerNetworkHandler_construct.original(_this, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17, a18, a19, a20, a21, a22, a23, a24);
@@ -160,12 +160,12 @@ TLHOOK(ServerScoreboard_construct, Scoreboard*, "??0ServerScoreboard@@QEAA@VComm
 	return global<Scoreboard> = ServerScoreboard_construct.original(_this, a1, a2);
 }
 //  Constructor for Player
-TLHOOK(Player_construct, Player*, "??0Player@@QEAA@AEAVLevel@@AEAVPacketSender@@W4GameType@@AEBVNetworkIdentifier@@W4SubClientId@@VUUID@mce@@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@6V?$unique_ptr@VCertificate@@U?$default_delete@VCertificate@@@std@@@9@AEAVEntityContext@@66@Z",
-	void* _this, void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6, void* arg7, void* arg8, void* arg9, void* arg10, void* arg11, void* arg12) {
+TLHOOK(Player_construct, Player*, "??0ServerPlayer@@QEAA@AEAVLevel@@AEAVPacketSender@@AEAVServerNetworkSystem@@AEAVActiveTransfersManager@Server@ClientBlobCache@@W4GameType@@_NAEBVNetworkIdentifier@@W4SubClientId@@V?$function@$$A6AXAEAVServerPlayer@@@Z@std@@VUUID@mce@@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@V?$unique_ptr@VCertificate@@U?$default_delete@VCertificate@@@std@@@std@@H5AEAVEntityContext@@@Z",
+	void* _this, void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6, void* arg7, void* arg8, void* arg9, void* arg10, void* arg11, void* arg12, void* arg13, void* arg14, void* arg15, void* arg16) {
 	// will be constructed twice, taking the first value
 	if (global<std::vector<Player*>> == nullptr)
 		global<std::vector<Player*>> = new std::vector<Player*>;
-	auto ret = Player_construct.original(_this, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
+	auto ret = Player_construct.original(_this, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15, arg16);
 	global<std::vector<Player*>>->push_back(ret);
 	return ret;
 }
@@ -298,7 +298,7 @@ Vec3 lastPlayerPosition;
 Vec3 lastClickPosition;
 NetworkIdentifier* lastPlayerNetworkIdentifier = NULL;
 __int64 lastUseItemTime = 0;
-TLHOOK(filterInventoryTransaction, void, "?handle@ServerNetworkHandler@@UEAAXAEBVNetworkIdentifier@@AEBVInventoryTransactionPacket@@@Z", uintptr_t _this, NetworkIdentifier* nid, InventoryTransactionPacket& packet) {
+TLHOOK(filterInventoryTransaction, void, "?handle@ServerNetworkHandler@@UEAAXAEBVNetworkIdentifier@@V?$shared_ptr@VInventoryTransactionPacket@@@std@@@Z", uintptr_t _this, NetworkIdentifier* nid, InventoryTransactionPacket& packet) {
 	// logger.debug(to_string(packet.transaction->transactionType), "AEBVInventoryTransactionPacket");
 	if(packet.transaction->transactionType == 2) {
 		if (lastPlayerNetworkIdentifier == nid && lastPlayerPosition == packet.transaction->playerPosition //&& lastClickPosition == packet.transaction->clickPosition
@@ -536,7 +536,7 @@ TLHOOK(onCalcDamage, float, "?calculateAttackDamage@Actor@@QEAAMAEAV1@@Z",
 	}
 }
 // player changed imension
-TLHOOK(onChangeDimension, bool, "?requestPlayerChangeDimension@Level@@UEAAXAEAVPlayer@@V?$unique_ptr@VChangeDimensionRequest@@U?$default_delete@VChangeDimensionRequest@@@std@@@std@@@Z",
+TLHOOK(onChangeDimension, bool, "?requestPlayerChangeDimension@PlayerDimensionTransferManager@@QEAAXAEBVPlayer@@$$QEAVChangeDimensionRequest@@@Z",
 	uintptr_t _this, Player* p, uintptr_t req) {
 	EventCallBackHelper h(EventCode::onChangeDimension);
 	bool result = onChangeDimension.original(_this, p, req);
@@ -714,7 +714,7 @@ TLHOOK(onCommandBlockUpdate, void, "?handle@ServerNetworkHandler@@UEAAXAEBVNetwo
 	onCommandBlockUpdate.original(_this, id, pkt);
 }
 // level block
-TLHOOK(onLevelExplode, bool, "?explode@Level@@UEAAXAEAVBlockSource@@PEAVActor@@AEBVVec3@@M_N3M3@Z",
+TLHOOK(onLevelExplode, bool, "?explode@Level@@UEAA_NAEAVBlockSource@@PEAVActor@@AEBVVec3@@M_N3M3@Z",
 	Level* _this, BlockSource* bs, Actor* a3, Vec3 pos, float a5, bool a6, bool a7, float a8, bool a9) {
 	EventCallBackHelper h(EventCode::onLevelExplode);
 	h
@@ -1053,7 +1053,7 @@ bool init_hooks(void)
 	onPreJoin.init(&onPreJoin);
 	onPlayerJoin.init(&onPlayerJoin);
 	onPlayerLeft.init(&onPlayerLeft);
-	filterInventoryTransaction.init(&filterInventoryTransaction);
+	filterInventoryTransaction.init(&filterInventoryTransaction); //*
 	onUseItem.init(&onUseItem);
 	onUseItemEx.init(&onUseItemEx);
 	onPlaceBlock.init(&onPlaceBlock);
@@ -1068,7 +1068,7 @@ bool init_hooks(void)
 	onPlayerInventoryChange.init(&onPlayerInventoryChange);
 	onAttack.init(&onAttack);
 	onCalcDamage.init(&onCalcDamage);
-	onChangeDimension.init(&onChangeDimension);
+	onChangeDimension.init(&onChangeDimension); //?
 	// onMobDie.init(&onMobDie);
 	// onMobHurt.init(&onMobHurt);
 	onRespawn.init(&onRespawn);
@@ -1077,14 +1077,14 @@ bool init_hooks(void)
 	onInputCommand.init(&onInputCommand);
 	onSelectForm.init(&onSelectForm);
 	onCommandBlockUpdate.init(&onCommandBlockUpdate);
-	onLevelExplode.init(&onLevelExplode);
+	onLevelExplode.init(&onLevelExplode); //?
 	onCommandBlockPerform.init(&onCommandBlockPerform);
 	onMove.init(&onMove);
 	onSetArmor.init(&onSetArmor);
 	onScoreChanged.init(&onScoreChanged);
-	onFallBlockTransform.init(&onFallBlockTransform);
-	onUseRespawnAnchorBlock.init(&onUseRespawnAnchorBlock);
-	onPistonPush.init(&onPistonPush);
+	onFallBlockTransform.init(&onFallBlockTransform); 
+	onUseRespawnAnchorBlock.init(&onUseRespawnAnchorBlock); 
+	onPistonPush.init(&onPistonPush); 
 	onEndermanRandomTeleport.init(&onEndermanRandomTeleport);
 	onDropItem.init(&onDropItem);
 	onTakeItem.init(&onTakeItem);
