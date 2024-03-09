@@ -285,6 +285,6 @@ if __name__ == "__main__":
     if overwrite or not os.path.exists("symbols.txt"):
         printc("Generating symbols.txt...", Fore.CYAN)
         start_time = time.time()
-        os.system(f".\cvdump.exe -headers -p {pdb_file_path} > symbols.txt")
+        os.system(f".\\cvdump.exe -headers -p {pdb_file_path} > symbols.txt")
         printc(f"Generated{timer(start_time, time.time())}!\n", Fore.GREEN)
     compare()
