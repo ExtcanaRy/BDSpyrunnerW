@@ -13,7 +13,7 @@ inline uintptr_t createPacket(int type) {
 }
 
 string Actor::getNameTag() {
-	return SymCall<string&>("?getNameTag@Actor@@UEBAAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ",
+	return SymCall<string&>("?getNameTag@Actor@@QEBAAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ",
 		this);
 }
 
@@ -22,7 +22,7 @@ void Actor::setNameTag(const string& name) {
 }
 
 void Actor::setNameTagVisible(bool visible) {
-	SymCall("?setNameTagVisible@Actor@@UEAAX_N@Z", this, visible);
+	SymCall("?setNameTagVisible@Actor@@QEAAX_N@Z", this, visible);
 }
 
 int Actor::getDimensionId() {
@@ -33,11 +33,11 @@ int Actor::getDimensionId() {
 }
 
 Vec3* Actor::getPos() {
-	return SymCall<Vec3*>("?getPosition@Actor@@UEBAAEBVVec3@@XZ", this);
+	return SymCall<Vec3*>("?getPosition@Actor@@QEBAAEBVVec3@@XZ", this);
 }
 
 Vec3* Actor::getPosPrev() {
-	return SymCall<Vec3*>("?getPosPrev@Actor@@UEBAAEBVVec3@@XZ", this);
+	return SymCall<Vec3*>("?getPosPrev@Actor@@QEBAAEBVVec3@@XZ", this);
 }
 
 float Actor::getSpeedInMetersPerSecond() {
@@ -60,13 +60,13 @@ BlockSource* Actor::getRegion() {
 }
 
 ItemStack* Actor::getArmor(int slot) {
-	return SymCall<ItemStack*>("?getArmor@Actor@@UEBAAEBVItemStack@@W4ArmorSlot@@@Z",
+	return SymCall<ItemStack*>("?getArmor@Actor@@QEBAAEBVItemStack@@W4ArmorSlot@@@Z",
 		this, slot);
 }
 
 unsigned Actor::getEntityTypeId() {
 	//return VirtualCall<unsigned>(0x550, this);
-	return SymCall<unsigned>("?getEntityTypeId@Actor@@UEBA?AW4ActorType@@XZ", this);
+	return SymCall<unsigned>("?getEntityTypeId@Actor@@QEBA?AW4ActorType@@XZ", this);
 }
 
 uintptr_t Actor::getOrCreateUniqueID() {
@@ -86,7 +86,7 @@ uintptr_t Actor::updateAttrs() {
 }
 
 AttributeInstance* Actor::getAttrs(void* a2) {
-	return SymCall<AttributeInstance*>("?getMutableAttribute@Actor@@UEAAPEAVAttributeInstance@@AEBVAttribute@@@Z", this, a2);
+	return SymCall<AttributeInstance*>("?getMutableAttribute@Actor@@QEAAPEAVAttributeInstance@@AEBVAttribute@@@Z", this, a2);
 }
 
 float Actor::getCurrentValue(AttributeInstance *attr) {
@@ -107,7 +107,7 @@ void Actor::setMaxValue(AttributeInstance *attr, float value) {
 
 // get level
 Level* Actor::getLevel() {
-	return SymCall<Level*>("?getCamera@Item@@UEBAPEAVICameraItemComponent@@XZ", this);
+	return SymCall<Level*>("?getCamera@Item@@QEBAPEAVICameraItemComponent@@XZ", this);
 }
 
 // add a effect
@@ -151,9 +151,9 @@ Tag* Actor::save() {
 	return t;
 }
 
-void Actor::setSize(float f1, float f2) {
-	SymCall("?setSize@Actor@@UEAAXMM@Z", this, f1, f2);
-}
+// void Actor::setSize(float f1, float f2) {
+// 	SymCall("?setSize@Actor@@UEAAXMM@Z", this, f1, f2);
+// }
 
 auto Actor::getAllEffects() {
 	return SymCall<uintptr_t>("?getAllEffects@Actor@@QEBAAEBV?$vector@VMobEffectInstance@@V?$allocator@VMobEffectInstance@@@std@@@std@@XZ", this);
@@ -343,7 +343,7 @@ void Player::openInventoryGUI(){
 //刷新区块
 
 void Player::resendAllChunks() {
-	SymCall("?resendAllChunks@Player@@UEAAXXZ", this);
+	SymCall("?resendAllChunks@Player@@QEAAXXZ", this);
 }
 
 //发送数据包

@@ -16,8 +16,8 @@ std::string* BinaryStream::GetAndReleaseData() {
 		this);
 }
 
-void BinaryStream::writeUnsignedInt(unsigned int num) {
-	SymCall("?writeUnsignedInt@BinaryStream@@QEAAXI@Z", this, num);
+void BinaryStream::writeUnsignedInt(unsigned int num, const char *str1, const char *str2) {
+	SymCall("?writeUnsignedInt@BinaryStream@@QEAAXIPEBD0@Z", this, num, str1, str2);
 }
 
 BinaryStream::~BinaryStream() {

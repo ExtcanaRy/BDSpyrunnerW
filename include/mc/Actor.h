@@ -62,7 +62,7 @@ struct Actor {
 	void setMaxHealth(float value);
 	ItemStack* getOffhandSlot();
 	Tag* save();
-	void setSize(float f1, float f2);
+	// void setSize(float f1, float f2);
 	auto getAllEffects();
 	void teleport(Vec3* target, int did);
 	bool addTag(const std::string& str);

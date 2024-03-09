@@ -403,8 +403,8 @@ TLHOOK(onDestroyBlock, bool, "?checkBlockDestroyPermissions@BlockSource@@QEAA_NA
 	return onDestroyBlock.original(_this, a1, a2, a3, a4);
 }
 // destroyed block
-TLHOOK(onDestroyedBlock, void, "?sendBlockDestroyedByPlayer@BlockEventCoordinator@@QEAAXAEAVPlayer@@AEBVBlock@@AEBVBlockPos@@@Z",
-    uintptr_t _this, Player* p, Block* b, BlockPos* bp) {
+TLHOOK(onDestroyedBlock, void, "?sendBlockDestroyedByPlayer@BlockEventCoordinator@@QEAAXAEAVPlayer@@AEBVBlock@@AEBVBlockPos@@AEBVItemStackBase@@3@Z",
+    uintptr_t _this, Player* p, Block* b, BlockPos* bp, void *ib1, void *ib2) {
 	EventCallBackHelper h(EventCode::onDestroyedBlock);
 	if (IsPlayer(p)) {
 		BlockLegacy* bl = b->getBlockLegacy();
@@ -415,7 +415,7 @@ TLHOOK(onDestroyedBlock, void, "?sendBlockDestroyedByPlayer@BlockEventCoordinato
 			.insert("position", bp);
 		h.call();
 	}
-	onDestroyedBlock.original(_this, p, b, bp);
+	onDestroyedBlock.original(_this, p, b, bp, ib1, ib2);
 }
 // open chest
 TLHOOK(onOpenChest, bool, "?use@ChestBlock@@UEBA_NAEAVPlayer@@AEBVBlockPos@@E@Z",
@@ -547,12 +547,12 @@ TLHOOK(onChangeDimension, bool, "?requestPlayerChangeDimension@PlayerDimensionTr
 }
 // mob die
 TLHOOK(onMobDie, void, "?die@Mob@@UEAAXAEBVActorDamageSource@@@Z",
-	Mob* _this, uintptr_t dmsg) {
+	Mob* _this, uintptr_t *dmsg) {
 	EventCallBackHelper h(EventCode::onMobDie);
 	char v71[8];
 	//IDA Mob::die Line142  v18 = (_QWORD *)(*(__int64 (__fastcall **)(const struct ActorDamageSource *, char *))(*(_QWORD *)a2 + 104i64))(a2, v71);
 	// wait for fix
-	Actor* sa = _this->getLevel()->fetchEntity(*(uintptr_t*)((*(uintptr_t(__fastcall**)(uintptr_t, char (*)[8]))(*(uintptr_t*)dmsg + 104))(dmsg, &v71)));
+	Actor* sa = _this->getLevel()->fetchEntity(*(uintptr_t *)((*(uintptr_t(__fastcall **)(uintptr_t *, char *))(*(uintptr_t *)dmsg + 104i64))(dmsg, v71)));
 	h
 		.insert("actor1", _this)
 		.insert("actor2", sa)
@@ -563,14 +563,22 @@ TLHOOK(onMobDie, void, "?die@Mob@@UEAAXAEBVActorDamageSource@@@Z",
 }
 // mob hurt
 TLHOOK(onMobHurt, bool, "?_hurt@Mob@@MEAA_NAEBVActorDamageSource@@M_N1@Z",
-	Mob* _this, uintptr_t dmsg, float a3, bool a4, bool a5) {
+	Mob* _this, uintptr_t *dmsg, float a3, bool a4, bool a5) {
 	EventCallBackHelper h(EventCode::onMobHurt);
 	g_damage = a3; // Set the value of Biological Injury to Adjustable
-	char v71[8];
+	int v34[4];
 	// getSourceUniqueId
 	//v21 = (_QWORD *)(*(__int64 (__fastcall **)(const struct ActorDamageSource *, char *))(*(_QWORD *)a2 + 104i64))(a2, v30);
 	// wait for fix
-	Actor* sa = _this->getLevel()->fetchEntity(*(uintptr_t*)((*(uintptr_t(__fastcall**)(uintptr_t, char (*)[8]))(*(uintptr_t*)dmsg + 104))(dmsg, &v71)));
+	v34[0] = *((int *)_this + 6);
+
+	// v21 = (int *)entt::basic_registry<EntityId,std::allocator<EntityId>>::try_get<NoActionTimeComponent>(
+    //                 *((uintptr_t *)_this + 2),
+    //                 v34);
+
+	// int *v21 = (int *)TLCALL("??$try_get@UNoActionTimeComponent@@@?$basic_registry@VEntityId@@V?$allocator@VEntityId@@@std@@@entt@@QEAA?A_PVEntityId@@@Z", uintptr_t (*)(uint64_t *a1, int *a2), (uint64_t *)*((uint64_t *)_this + 2), v34);
+
+	Actor* sa = _this->getLevel()->fetchEntity(*(uintptr_t *)((*(__int64 (__fastcall **)(uintptr_t *, int *))(*(__int64 *)dmsg + 104i64))(dmsg, v34)));
 	h
 		.insert("actor1", _this)
 		.insert("actor2", sa)
@@ -1053,7 +1061,7 @@ bool init_hooks(void)
 	onPreJoin.init(&onPreJoin);
 	onPlayerJoin.init(&onPlayerJoin);
 	onPlayerLeft.init(&onPlayerLeft);
-	filterInventoryTransaction.init(&filterInventoryTransaction); //*
+	// filterInventoryTransaction.init(&filterInventoryTransaction); //Crash
 	onUseItem.init(&onUseItem);
 	onUseItemEx.init(&onUseItemEx);
 	onPlaceBlock.init(&onPlaceBlock);
@@ -1065,12 +1073,12 @@ bool init_hooks(void)
 	onCloseChest.init(&onCloseChest);
 	onCloseBarrel.init(&onCloseBarrel);
 	onContainerChange.init(&onContainerChange);
-	onPlayerInventoryChange.init(&onPlayerInventoryChange);
+	// onPlayerInventoryChange.init(&onPlayerInventoryChange); //Crash
 	onAttack.init(&onAttack);
 	onCalcDamage.init(&onCalcDamage);
 	onChangeDimension.init(&onChangeDimension); //?
-	// onMobDie.init(&onMobDie);
-	// onMobHurt.init(&onMobHurt);
+	// onMobDie.init(&onMobDie); // Crash
+	// onMobHurt.init(&onMobHurt); // Crash
 	onRespawn.init(&onRespawn);
 	onChat.init(&onChat);
 	onInputText.init(&onInputText);
@@ -1094,7 +1102,7 @@ bool init_hooks(void)
 	onJump.init(&onJump);
 	onFireSpread.init(&onFireSpread);
 	onBlockInteracted.init(&onBlockInteracted);
-	onBlockExploded.init(&onBlockExploded);
+	// onBlockExploded.init(&onBlockExploded); //Crash
 	onUseSignBlock.init(&onUseSignBlock);
 	// onLiquidSpread.init(&onLiquidSpread);
 	onChatPkt.init(&onChatPkt);

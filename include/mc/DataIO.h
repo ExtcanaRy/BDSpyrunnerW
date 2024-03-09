@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <vector>
 
 struct ReadOnlyBinaryStream {
 public:
@@ -30,7 +31,7 @@ public:
 	BinaryStream(std::string* buffer, bool copy);
 	~BinaryStream();
 	std::string* GetAndReleaseData();
-	void writeUnsignedInt(unsigned int num);
+	void writeUnsignedInt(unsigned int num, const char *str1, const char *str2);
 	inline void reset() {
 		mOwnedBuffer.clear();
 		setReadPointer(0);

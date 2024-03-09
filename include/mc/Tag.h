@@ -27,7 +27,7 @@ struct Tag {
 	void putInt(const std::string& key, int value);
 	void putInt64(const std::string& key, long long value);
 	void putFloat(const std::string& key, float value);
-	void putByteArray(const std::string& key, const TagMemoryChunk& value);
+	void putByteArray(const std::string& key, const std::vector<unsigned char>& value);
 	void putCompound(const std::string& key, const Tag* value);
 
 	void add(Tag* t);

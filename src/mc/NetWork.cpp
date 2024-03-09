@@ -21,7 +21,7 @@ SystemAddress::SystemAddress() {
 }
 
 string SystemAddress::toString() {
-	return SymCall<const char*>("?ToString@SystemAddress@RakNet@@QEBAPEBD_ND@Z",
+	return SymCall<const char*>("?ToString@SystemAddress@RakNet@@QEBAX_NPEADD@Z",
 		this, true, ':');
 }
 

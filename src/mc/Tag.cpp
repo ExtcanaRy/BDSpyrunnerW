@@ -52,8 +52,8 @@ void Tag::putFloat(const string& key, float value) {
 		this, key, value);
 }
 
-void Tag::putByteArray(const string& key, const TagMemoryChunk& value) {
-	return SymCall("?putByteArray@CompoundTag@@QEAAAEAUTagMemoryChunk@@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@U2@@Z",
+void Tag::putByteArray(const string& key, const vector<unsigned char>& value) {
+	return SymCall("?putByteArray@CompoundTag@@QEAAAEAV?$vector@EV?$allocator@E@std@@@std@@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@3@V23@@Z",
 		this, key, &value);
 }
 
@@ -227,11 +227,15 @@ Tag* ObjecttoTag(const Json& value) {
 			break;
 		case TagType::ByteArray: {
 			size_t size = val.size();
-			uint8_t* data = new uint8_t[size];
+			vector<uint8_t> uchar_vec;
+			// uint8_t* data = new uint8_t[size];
 			for (unsigned i = 0; i < size; ++i)
-				data[i] = uint8_t(val[i].get<int>());
-			TagMemoryChunk tmc(size, data);
-			c->putByteArray(new_key, tmc);
+				uchar_vec.push_back(uint8_t(val[i].get<int>()));
+				// data[i] = uint8_t(val[i].get<int>());
+				
+			// TagMemoryChunk tmc(size, data);
+			// c->putByteArray(new_key, tmc);
+			c->putByteArray(new_key, uchar_vec);
 			break;
 		}
 		case TagType::String:

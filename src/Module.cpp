@@ -438,7 +438,7 @@ static PyObject* explode(PyObject*, PyObject* args) {
 	BlockSource* bs = global<Level>->getBlockSource(did);
 	if (!bs)
 		Py_RETURN_ERROR("Unknown dimension ID");
-	SymCall<bool>("?explode@Level@@UEAAXAEAVBlockSource@@PEAVActor@@AEBVVec3@@M_N3M3@Z",
+	SymCall<bool>("?explode@Level@@UEAA_NAEAVBlockSource@@PEAVActor@@AEBVVec3@@M_N3M3@Z",
 		global<Level>, bs, nullptr, pos, power, fire, destroy, range, true);
 	Py_RETURN_NONE;
 }
