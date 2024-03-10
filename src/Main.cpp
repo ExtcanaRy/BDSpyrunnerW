@@ -1055,58 +1055,58 @@ bool init_hooks(void)
 	Player_destruct.init(&Player_destruct);
 	ChangeSettingCommand_setup.init(&ChangeSettingCommand_setup);
 
-	onServerStarted.init(&onServerStarted);
-	onConsoleOutput.init(&onConsoleOutput);
-	onConsoleInput.init(&onConsoleInput);
-	onPreJoin.init(&onPreJoin);
+	onServerStarted.init(&onServerStarted); //ok
+	onConsoleOutput.init(&onConsoleOutput); //?
+	onConsoleInput.init(&onConsoleInput); //ok
+	onPreJoin.init(&onPreJoin); //X
 	onPlayerJoin.init(&onPlayerJoin); //X
 	onPlayerLeft.init(&onPlayerLeft); //X
-	filterInventoryTransaction.init(&filterInventoryTransaction); //Crash
-	onUseItem.init(&onUseItem);
-	onUseItemEx.init(&onUseItemEx);
-	onPlaceBlock.init(&onPlaceBlock);
-	onPlacedBlock.init(&onPlacedBlock);
+	// filterInventoryTransaction.init(&filterInventoryTransaction); //Crash
+	onUseItem.init(&onUseItem); //ok
+	onUseItemEx.init(&onUseItemEx); //ok
+	onPlaceBlock.init(&onPlaceBlock); //?
+	onPlacedBlock.init(&onPlacedBlock); //?
 	// onDestroyBlock.init(&onDestroyBlock);
 	// onDestroyedBlock.init(&onDestroyedBlock);
-	onOpenChest.init(&onOpenChest);
-	onOpenBarrel.init(&onOpenBarrel);
-	onCloseChest.init(&onCloseChest);
-	onCloseBarrel.init(&onCloseBarrel);
-	onContainerChange.init(&onContainerChange);
+	onOpenChest.init(&onOpenChest); //ok
+	onOpenBarrel.init(&onOpenBarrel); //ok
+	onCloseChest.init(&onCloseChest); //ok
+	onCloseBarrel.init(&onCloseBarrel); //ok
+	// onContainerChange.init(&onContainerChange); //Crash
 	// onPlayerInventoryChange.init(&onPlayerInventoryChange); //Crash
-	onAttack.init(&onAttack);
-	onCalcDamage.init(&onCalcDamage);
-	onChangeDimension.init(&onChangeDimension); //?
-	onMobDie.init(&onMobDie); //X
-	onMobHurt.init(&onMobHurt); //X
+	onAttack.init(&onAttack); //ok
+	onCalcDamage.init(&onCalcDamage); //?
+	onChangeDimension.init(&onChangeDimension); //ok
+	// onMobDie.init(&onMobDie); //Crash
+	// onMobHurt.init(&onMobHurt); //Crash
 	onRespawn.init(&onRespawn);
 	onChat.init(&onChat); //ok
-	onInputText.init(&onInputText);
-	onInputCommand.init(&onInputCommand);
+	onInputText.init(&onInputText); //X
+	onInputCommand.init(&onInputCommand); //ok
 	onSelectForm.init(&onSelectForm);
 	onCommandBlockUpdate.init(&onCommandBlockUpdate);
-	onLevelExplode.init(&onLevelExplode); //?
+	onLevelExplode.init(&onLevelExplode); //ok
 	onCommandBlockPerform.init(&onCommandBlockPerform);
 	onMove.init(&onMove); //ok
 	onSetArmor.init(&onSetArmor); //ok
 	onScoreChanged.init(&onScoreChanged);
-	onFallBlockTransform.init(&onFallBlockTransform); 
-	onUseRespawnAnchorBlock.init(&onUseRespawnAnchorBlock); 
-	onPistonPush.init(&onPistonPush); 
-	onEndermanRandomTeleport.init(&onEndermanRandomTeleport);
-	onDropItem.init(&onDropItem);
+	onFallBlockTransform.init(&onFallBlockTransform); //?
+	onUseRespawnAnchorBlock.init(&onUseRespawnAnchorBlock); //X
+	onPistonPush.init(&onPistonPush); //ok
+	onEndermanRandomTeleport.init(&onEndermanRandomTeleport); //ok
+	onDropItem.init(&onDropItem); //ok
 	onTakeItem.init(&onTakeItem); //ok
-	onRide.init(&onRide);
-	onUseFrameBlock.init(&onUseFrameBlock);
-	onUseFrameBlock2.init(&onUseFrameBlock2);
-	onJump.init(&onJump);
-	onFireSpread.init(&onFireSpread);
-	onBlockInteracted.init(&onBlockInteracted); //Crash
-	onBlockExploded.init(&onBlockExploded); //Crash
-	onUseSignBlock.init(&onUseSignBlock);
+	onRide.init(&onRide); //ok
+	onUseFrameBlock.init(&onUseFrameBlock); //ok
+	onUseFrameBlock2.init(&onUseFrameBlock2); //ok
+	onJump.init(&onJump); //?
+	onFireSpread.init(&onFireSpread); //ok
+	// onBlockInteracted.init(&onBlockInteracted); //Crash
+	onBlockExploded.init(&onBlockExploded); //ok
+	onUseSignBlock.init(&onUseSignBlock); //X
 	// onLiquidSpread.init(&onLiquidSpread); //Crash
-	onChatPkt.init(&onChatPkt);
-	onTick.init(&onTick);
+	onChatPkt.init(&onChatPkt); //X
+	onTick.init(&onTick); //ok
 
 	lh_enable_all_hook();
 
