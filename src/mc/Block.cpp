@@ -3,7 +3,7 @@
 
 using namespace std;
 string BlockLegacy::getBlockName() {
-	return Dereference<string>(this , 128);
+	return Dereference<string>(this , 160);
 }
 
 short BlockLegacy::getBlockItemID() {
@@ -17,7 +17,13 @@ short BlockLegacy::getBlockItemID() {
 }
 
 BlockLegacy* Block::getBlockLegacy() {
-	return Dereference<BlockLegacy*>(this , 16);
+	// return Dereference<BlockLegacy*>(this , 6);
+	return (BlockLegacy *)*((long long *)this + 6);
+}
+
+char *Block::getName()
+{
+	return (char *)this + 158i64;
 }
 
 Block* BlockActor::getBlock() {

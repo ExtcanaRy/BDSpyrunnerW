@@ -8,6 +8,7 @@ struct BlockLegacy {
 };
 struct Block {
 	BlockLegacy* getBlockLegacy();
+	char *getName();
 };
 struct BlockActor {
 	Block* getBlock();
