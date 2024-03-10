@@ -21,8 +21,12 @@ SystemAddress::SystemAddress() {
 }
 
 string SystemAddress::toString() {
-	return SymCall<const char*>("?ToString@SystemAddress@RakNet@@QEBAX_NPEADD@Z",
-		this, true, ':');
+	char v6[56];
+	// return SymCall<const char*>("?ToString@SystemAddress@RakNet@@QEBAX_NPEADD@Z",
+	// 	this, true, ':');
+	(char *)SymCall<const char*>("?ToString@SystemAddress@RakNet@@QEBAX_NPEADD@Z",
+		this, true, v6, ':');
+	return v6;
 }
 
 SystemAddress RakPeer::getSystemAddress(NetworkIdentifier* ni) {

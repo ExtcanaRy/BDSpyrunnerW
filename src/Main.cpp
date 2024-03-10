@@ -279,6 +279,9 @@ TLHOOK(onPlayerJoin, void, "?handle@ServerNetworkHandler@@UEAAXAEBVNetworkIdenti
 	ServerNetworkHandler* _this, NetworkIdentifier *id,/*SetLocalPlayerAsInitializedPacket*/ uintptr_t pkt) {
 	EventCallBackHelper h(EventCode::onPlayerJoin);
 	Player* p = _this->_getServerPlayer(id, pkt);
+
+	PyObject *test = ToEntity(p);
+
 	if (p) {
 		h.setArg(ToEntity(p)).call();
 	}
@@ -1059,7 +1062,7 @@ bool init_hooks(void)
 	onConsoleOutput.init(&onConsoleOutput); //?
 	onConsoleInput.init(&onConsoleInput); //ok
 	onPreJoin.init(&onPreJoin); //X
-	onPlayerJoin.init(&onPlayerJoin); //X
+	onPlayerJoin.init(&onPlayerJoin); //ok
 	onPlayerLeft.init(&onPlayerLeft); //X
 	// filterInventoryTransaction.init(&filterInventoryTransaction); //Crash
 	onUseItem.init(&onUseItem); //ok

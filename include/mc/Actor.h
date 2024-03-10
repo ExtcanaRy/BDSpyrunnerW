@@ -109,7 +109,7 @@ struct Player : Mob {
 inline bool IsPlayer(Actor* ptr) {
 	if (ptr == nullptr)
 		return false;
-	if (ptr->getEntityTypeId() != 1)
+	if (ptr->getEntityTypeId() != 0x13F)
 		return false;
 	return true;
 }
