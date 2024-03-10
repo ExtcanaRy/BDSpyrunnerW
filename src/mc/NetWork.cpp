@@ -33,7 +33,7 @@ SystemAddress RakPeer::getSystemAddress(NetworkIdentifier* ni) {
 	return sa;
 }
 
-Player* ServerNetworkHandler::_getServerPlayer(uintptr_t id, uintptr_t pkt) {
+Player* ServerNetworkHandler::_getServerPlayer(const struct NetworkIdentifier* id, uintptr_t pkt) {
 	auto v3 = (ServerNetworkHandler*)((char*)this - 16);
 	return SymCall<Player*>("?_getServerPlayer@ServerNetworkHandler@@EEAAPEAVServerPlayer@@AEBVNetworkIdentifier@@W4SubClientId@@@Z",
 		v3, id, Dereference<char>(pkt, 16));

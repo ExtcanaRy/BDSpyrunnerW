@@ -202,11 +202,11 @@ string Player::getUuid() {//IDA ServerNetworkHandler::_createNewPlayer 222
 	//uintptr_t userid = SymCall<uintptr_t>("??$tryGetComponent@VUserEntityIdentifierComponent@@@Actor@@QEAAPEAVUserEntityIdentifierComponent@@XZ",
 	//	this);
 	string p;
-	void* v33 = **(void***)(this + 8);
-	int v107 = *(int*)(this + 16);
-	void* v34 = SymCall<void*>("??$try_get@VUserEntityIdentifierComponent@@@?$basic_registry@VEntityId@@V?$allocator@VEntityId@@@std@@@entt@@QEAA?A_PVEntityId@@@Z", v33, &v107);
+	void *v33 = *(void **)((int64_t)this + 16);
+	int v107 = *(int *)((int64_t)this + 24);
+	void *v34 = SymCall<void*>("??$try_get@VUserEntityIdentifierComponent@@@?$basic_registry@VEntityId@@V?$allocator@VEntityId@@@std@@@entt@@QEAA?A_PVEntityId@@@Z", v33, &v107);
 	SymCall<string&>("?asString@UUID@mce@@QEBA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ",
-		uintptr_t(v34) + 168, &p);
+		(uintptr_t)v34 + 168, &p);
 	return p;
 }
 

@@ -15,7 +15,7 @@ struct RakPeer {
 	SystemAddress getSystemAddress(NetworkIdentifier* ni);
 };
 struct ServerNetworkHandler {
-	struct Player* _getServerPlayer(uintptr_t id, uintptr_t pkt);
+	struct Player* _getServerPlayer(const struct NetworkIdentifier* id, uintptr_t pkt);
 };
 struct RakNetGUID {
 	uint64_t unk;

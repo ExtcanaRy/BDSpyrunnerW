@@ -276,7 +276,7 @@ TLHOOK(onPreJoin, void, "?sendLoginMessageLocal@ServerNetworkHandler@@QEAAXAEBVN
 }
 // Send packet on player join
 TLHOOK(onPlayerJoin, void, "?handle@ServerNetworkHandler@@UEAAXAEBVNetworkIdentifier@@AEBVSetLocalPlayerAsInitializedPacket@@@Z",
-	ServerNetworkHandler* _this, uintptr_t id,/*SetLocalPlayerAsInitializedPacket*/ uintptr_t pkt) {
+	ServerNetworkHandler* _this, NetworkIdentifier *id,/*SetLocalPlayerAsInitializedPacket*/ uintptr_t pkt) {
 	EventCallBackHelper h(EventCode::onPlayerJoin);
 	Player* p = _this->_getServerPlayer(id, pkt);
 	if (p) {
@@ -616,7 +616,7 @@ TLHOOK(onChat, void, "?fireEventPlayerMessage@MinecraftEventing@@AEAAXAEBV?$basi
 }
 // player send chat message
 TLHOOK(onInputText, void, "?handle@ServerNetworkHandler@@UEAAXAEBVNetworkIdentifier@@AEBVTextPacket@@@Z",
-	ServerNetworkHandler* _this, uintptr_t id, /*TextPacket*/uintptr_t pkt) {
+	ServerNetworkHandler* _this, NetworkIdentifier *id, /*TextPacket*/uintptr_t pkt) {
 	EventCallBackHelper h(EventCode::onInputText);
 	Player* p = _this->_getServerPlayer(id, pkt);
 	if (p) {
@@ -630,7 +630,7 @@ TLHOOK(onInputText, void, "?handle@ServerNetworkHandler@@UEAAXAEBVNetworkIdentif
 }
 // player execute command
 TLHOOK(onInputCommand, void, "?handle@ServerNetworkHandler@@UEAAXAEBVNetworkIdentifier@@AEBVCommandRequestPacket@@@Z",
-	ServerNetworkHandler* _this, uintptr_t id, /*CommandRequestPacket*/uintptr_t pkt) {
+	ServerNetworkHandler* _this, NetworkIdentifier *id, /*CommandRequestPacket*/uintptr_t pkt) {
 	EventCallBackHelper h(EventCode::onInputCommand);
 	Player* p = _this->_getServerPlayer(id, pkt);
 	if (p) {
@@ -652,7 +652,7 @@ TLHOOK(onInputCommand, void, "?handle@ServerNetworkHandler@@UEAAXAEBVNetworkIden
 }
 // player select form
 TLHOOK(onSelectForm, void, "?handle@?$PacketHandlerDispatcherInstance@VModalFormResponsePacket@@$0A@@@UEBAXAEBVNetworkIdentifier@@AEAVNetEventCallback@@AEAV?$shared_ptr@VPacket@@@std@@@Z",
-	uintptr_t _this, uintptr_t id, ServerNetworkHandler* handle, uintptr_t* ppkt) {
+	uintptr_t _this, NetworkIdentifier *id, ServerNetworkHandler* handle, uintptr_t* ppkt) {
 	EventCallBackHelper h(EventCode::onSelectForm);
 	uintptr_t pkt = *ppkt;
 	Player* p = handle->_getServerPlayer(id, pkt);
@@ -695,7 +695,7 @@ TLHOOK(onSelectForm, void, "?handle@?$PacketHandlerDispatcherInstance@VModalForm
 }
 // command block content update
 TLHOOK(onCommandBlockUpdate, void, "?handle@ServerNetworkHandler@@UEAAXAEBVNetworkIdentifier@@AEBVCommandBlockUpdatePacket@@@Z",
-	ServerNetworkHandler* _this, uintptr_t id, /*CommandBlockUpdatePacket*/uintptr_t pkt) {
+	ServerNetworkHandler* _this, NetworkIdentifier *id, /*CommandBlockUpdatePacket*/uintptr_t pkt) {
 	EventCallBackHelper h(EventCode::onCommandBlockUpdate);
 	Player* p = _this->_getServerPlayer(id, pkt);
 	if (p) {
@@ -1059,50 +1059,50 @@ bool init_hooks(void)
 	onConsoleOutput.init(&onConsoleOutput);
 	onConsoleInput.init(&onConsoleInput);
 	onPreJoin.init(&onPreJoin);
-	onPlayerJoin.init(&onPlayerJoin);
-	onPlayerLeft.init(&onPlayerLeft);
-	// filterInventoryTransaction.init(&filterInventoryTransaction); //Crash
-	onUseItem.init(&onUseItem); //Crash
-	onUseItemEx.init(&onUseItemEx); //Crash
-	onPlaceBlock.init(&onPlaceBlock); //Crash
-	onPlacedBlock.init(&onPlacedBlock); //Crash
+	onPlayerJoin.init(&onPlayerJoin); //X
+	onPlayerLeft.init(&onPlayerLeft); //X
+	filterInventoryTransaction.init(&filterInventoryTransaction); //Crash
+	onUseItem.init(&onUseItem);
+	onUseItemEx.init(&onUseItemEx);
+	onPlaceBlock.init(&onPlaceBlock);
+	onPlacedBlock.init(&onPlacedBlock);
 	// onDestroyBlock.init(&onDestroyBlock);
 	// onDestroyedBlock.init(&onDestroyedBlock);
-	// onOpenChest.init(&onOpenChest);
-	// onOpenBarrel.init(&onOpenBarrel);
-	// onCloseChest.init(&onCloseChest);
-	// onCloseBarrel.init(&onCloseBarrel);
-	// onContainerChange.init(&onContainerChange);
+	onOpenChest.init(&onOpenChest);
+	onOpenBarrel.init(&onOpenBarrel);
+	onCloseChest.init(&onCloseChest);
+	onCloseBarrel.init(&onCloseBarrel);
+	onContainerChange.init(&onContainerChange);
 	// onPlayerInventoryChange.init(&onPlayerInventoryChange); //Crash
-	// onAttack.init(&onAttack);
-	// onCalcDamage.init(&onCalcDamage);
-	// onChangeDimension.init(&onChangeDimension); //?
-	// onMobDie.init(&onMobDie); // Crash
-	// onMobHurt.init(&onMobHurt); // Crash
-	// onRespawn.init(&onRespawn);
-	// onChat.init(&onChat);
-	// onInputText.init(&onInputText);
-	// onInputCommand.init(&onInputCommand);
-	// onSelectForm.init(&onSelectForm);
-	// onCommandBlockUpdate.init(&onCommandBlockUpdate);
-	// onLevelExplode.init(&onLevelExplode); //?
-	// onCommandBlockPerform.init(&onCommandBlockPerform);
-	// onMove.init(&onMove);
-	// onSetArmor.init(&onSetArmor); //ok
-	// onScoreChanged.init(&onScoreChanged);
-	// onFallBlockTransform.init(&onFallBlockTransform); 
-	// onUseRespawnAnchorBlock.init(&onUseRespawnAnchorBlock); 
-	// onPistonPush.init(&onPistonPush); 
-	// onEndermanRandomTeleport.init(&onEndermanRandomTeleport);
-	// onDropItem.init(&onDropItem);
-	// onTakeItem.init(&onTakeItem); //ok
-	// onRide.init(&onRide);
-	// onUseFrameBlock.init(&onUseFrameBlock);
-	// onUseFrameBlock2.init(&onUseFrameBlock2);
-	// onJump.init(&onJump);
-	// onFireSpread.init(&onFireSpread);
-	// onBlockInteracted.init(&onBlockInteracted); //Crash
-	// onBlockExploded.init(&onBlockExploded); //Crash
+	onAttack.init(&onAttack);
+	onCalcDamage.init(&onCalcDamage);
+	onChangeDimension.init(&onChangeDimension); //?
+	onMobDie.init(&onMobDie); //X
+	onMobHurt.init(&onMobHurt); //X
+	onRespawn.init(&onRespawn);
+	onChat.init(&onChat); //ok
+	onInputText.init(&onInputText);
+	onInputCommand.init(&onInputCommand);
+	onSelectForm.init(&onSelectForm);
+	onCommandBlockUpdate.init(&onCommandBlockUpdate);
+	onLevelExplode.init(&onLevelExplode); //?
+	onCommandBlockPerform.init(&onCommandBlockPerform);
+	onMove.init(&onMove); //ok
+	onSetArmor.init(&onSetArmor); //ok
+	onScoreChanged.init(&onScoreChanged);
+	onFallBlockTransform.init(&onFallBlockTransform); 
+	onUseRespawnAnchorBlock.init(&onUseRespawnAnchorBlock); 
+	onPistonPush.init(&onPistonPush); 
+	onEndermanRandomTeleport.init(&onEndermanRandomTeleport);
+	onDropItem.init(&onDropItem);
+	onTakeItem.init(&onTakeItem); //ok
+	onRide.init(&onRide);
+	onUseFrameBlock.init(&onUseFrameBlock);
+	onUseFrameBlock2.init(&onUseFrameBlock2);
+	onJump.init(&onJump);
+	onFireSpread.init(&onFireSpread);
+	onBlockInteracted.init(&onBlockInteracted); //Crash
+	onBlockExploded.init(&onBlockExploded); //Crash
 	onUseSignBlock.init(&onUseSignBlock);
 	// onLiquidSpread.init(&onLiquidSpread); //Crash
 	onChatPkt.init(&onChatPkt);
